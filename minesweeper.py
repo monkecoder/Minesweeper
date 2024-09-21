@@ -6,6 +6,7 @@ from types import MappingProxyType
 import numpy as np
 from PySide6 import QtCore, QtGui, QtWidgets
 
+from gui.minesweeper_settings_ui import Ui_MinesweeperSettings
 from gui.minesweeper_window_ui import Ui_MinesweeperWindow
 
 BASE_PATH = Path(__file__).parent
@@ -91,19 +92,39 @@ class CustomLabel(QtWidgets.QLabel):
         return f"CustomLabel: row={self.row()}, column={self.column()}, mined={self.mined}, text={self.text()}"
 
 
-class MinesweeperSettings(QtWidgets.QWidget):
-    """Minesweeper settings window."""
+class MinesweeperSettings(QtWidgets.QDialog, Ui_MinesweeperSettings):
+    """Minesweeper settings dialog."""
 
-    def __init__(self):
-        pass
+    def __init__(self, parent):
+        """Initialize minesweeper settings dialog."""
+        QtWidgets.QDialog.__init__(self, parent, QtCore.Qt.WindowType.Dialog)
+        self.setupUi(self)
+        self.spinBox_rows.setMinimum(4)
+        self.spinBox_rows.setMaximum(50)
+        self.spinBox_cols.setMinimum(4)
+        self.spinBox_rows.setMaximum(50)
+        self.spinBox_mines.setMinimum(1)
+
+        self.spinBox_rows.valueChanged.connect(self.check_max_mines)
+        self.spinBox_cols.valueChanged.connect(self.check_max_mines)
+
+    def check_max_mines(self):
+        """Update spinBox_mines maximum value to fit the field size."""
+        # at least 1 free cell for chance to win
+        mines_max = self.spinBox_rows.value() * self.spinBox_cols.value() - 1
+        self.spinBox_mines.setMaximum(mines_max)
 
 
 class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
     """Minesweeper main window."""
 
     def __init__(self, parent=None, flags=QtCore.Qt.WindowFlags()):
-        """Initialize minesweeper window."""
+        """Initialize minesweeper main window."""
         QtWidgets.QMainWindow.__init__(self, parent, flags)
+        self.settings_dialog = MinesweeperSettings(self)
+        self.settings_dialog.setWindowModality(QtCore.Qt.WindowModality.ApplicationModal)
+        self.settings_dialog.buttonBox.accepted.connect(self._update_settings)
+
         self.setupUi(self)
         self.setWindowTitle("Minesweeper")
         self.setWindowIcon(QtGui.QIcon(str(BASE_PATH / "images" / "pig.png")))
@@ -125,6 +146,7 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
         self.timer.timeout.connect(self._timer_job)
 
         self.action_startNewGame.triggered.connect(self.start_new_game)
+        self.action_settings.triggered.connect(self.show_settings_dialog)
 
         # Inits
         self._num_rows = 0
@@ -145,11 +167,22 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
     def start_new_game(self):
         """Start a new game."""
         # ask only after game started
-        if not self._uncovered_cells or QtWidgets.QMessageBox.question(
+        if not self._uncovered_cells or self._game_state != GAME_NONE or QtWidgets.QMessageBox.question(
             self, "Confirm", "Are you sure you want to start a new game?",
             QtWidgets.QMessageBox.StandardButton.Yes, QtWidgets.QMessageBox.StandardButton.No
         ) == QtWidgets.QMessageBox.StandardButton.Yes:
             self._set_field()
+
+    def show_settings_dialog(self):
+        self.settings_dialog.spinBox_rows.setValue(self.settings_rows)
+        self.settings_dialog.spinBox_cols.setValue(self.settings_cols)
+        self.settings_dialog.spinBox_mines.setValue(self.settings_mines)
+        self.settings_dialog.show()
+
+    def _update_settings(self):
+        self.settings_rows = self.settings_dialog.spinBox_rows.value()
+        self.settings_cols = self.settings_dialog.spinBox_cols.value()
+        self.settings_mines = self.settings_dialog.spinBox_mines.value()
 
     def _emit_uncovered_cells(self):
         """Update data for lineEdit_cellsUncovered widget."""
