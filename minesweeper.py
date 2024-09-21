@@ -1,4 +1,4 @@
-"""Minesweeper game on PySide6."""
+"""Minesweeper game based on PySide6."""
 
 from pathlib import Path
 from types import MappingProxyType
@@ -13,9 +13,9 @@ BASE_PATH = Path(__file__).parent
 CODE_COVERED = "c"              # cell is covered, default
 CODE_COVERED_FLAG = "f"         # cell is covered, flag
 CODE_UNCOVERED = "u"            # cell is uncovered, default
-CODE_UNCOVERED_MINE = "m"       # cell is uncovered, bomb is here
-CODE_UNCOVERED_MINE_OK = "o"    # cell is uncovered, bomb neutralized
-CODE_UNCOVERED_MINE_BAD = "b"   # cell is uncovered, bom exploded
+CODE_UNCOVERED_MINE = "m"       # cell is uncovered, mine
+CODE_UNCOVERED_MINE_OK = "o"    # cell is uncovered, mine neutralized
+CODE_UNCOVERED_MINE_BAD = "b"   # cell is uncovered, mine exploded
 
 PICT_DICT = MappingProxyType({
     CODE_COVERED:            QtGui.QImage(BASE_PATH / "images" / "cell_white.png"),
@@ -47,12 +47,8 @@ class ItemDelegate(QtWidgets.QStyledItemDelegate):
 
     def paint(self, painter, option, index):
         painter.save()
-        # if not self.failed:
         text = self.table_widget.item(index.row(), index.column()).text()
         painter.drawImage(option.rect, PICT_DICT[text[0]])
-        # painter.drawPixmap(option.rect, TEST_PIXMAP)
-        # else:
-        #     painter.drawImage(self.table_widget.rect(), PICT_DICT[CODE_UNCOVERED_MINE])
         painter.restore()
 
 
@@ -81,18 +77,13 @@ class CustomLabel(QtWidgets.QLabel):
         return self.item.column()
 
     def eventFilter(self, watched, event):
-        # if event.type() == QtCore.QEvent.Type.MouseButtonPress:
-        #     print(event.position().toPoint())
-
-        if event.type() == QtCore.QEvent.Type.MouseButtonRelease:
-            # print(event.position().toPoint())
-
-            if watched.rect().contains(event.position().toPoint()):
-                event_button = event.button()
-                if event_button == QtCore.Qt.MouseButton.LeftButton:
-                    self.signal_cell_left_btn.emit(watched.row(), watched.column())
-                elif event_button == QtCore.Qt.MouseButton.RightButton:
-                    self.signal_cell_right_btn.emit(watched.row(), watched.column())
+        if (event.type() == QtCore.QEvent.Type.MouseButtonRelease and
+                watched.rect().contains(event.position().toPoint())):
+            event_button = event.button()
+            if event_button == QtCore.Qt.MouseButton.LeftButton:
+                self.signal_cell_left_btn.emit(watched.row(), watched.column())
+            elif event_button == QtCore.Qt.MouseButton.RightButton:
+                self.signal_cell_right_btn.emit(watched.row(), watched.column())
 
         return False
 
@@ -111,6 +102,7 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
     """Minesweeper main window."""
 
     def __init__(self, parent=None, flags=QtCore.Qt.WindowFlags()):
+        """Initialize minesweeper window."""
         QtWidgets.QMainWindow.__init__(self, parent, flags)
         self.setupUi(self)
         self.setWindowTitle("Minesweeper")
@@ -146,10 +138,12 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
         self._set_field()
 
     def _timer_job(self):
+        """Update data for timeEdit_timer widget (executed by timer)."""
         time_obj = self.timeEdit_timer.time().addMSecs(self.timer.interval())
         self.timeEdit_timer.setTime(time_obj)
 
     def start_new_game(self):
+        """Start a new game."""
         # ask only after game started
         if not self._uncovered_cells or QtWidgets.QMessageBox.question(
             self, "Confirm", "Are you sure you want to start a new game?",
@@ -158,15 +152,17 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
             self._set_field()
 
     def _emit_uncovered_cells(self):
+        """Update data for lineEdit_cellsUncovered widget."""
         self.lineEdit_cellsUncovered.setText(f"{self._uncovered_cells}/"
                                              f"{self._num_rows * self._num_cols - self._num_mines}")
 
     def _emit_flagged_cells(self):
+        """Update data for lineEdit_minesFlagged widget."""
         flagged_bombs = min(self._num_mines, self._flagged_cells)
         self.lineEdit_minesFlagged.setText(f"{flagged_bombs}/{self._num_mines}")
 
     def _set_field(self):
-        """Set specified field size."""
+        """Init field with size specified in settings (start a new game)."""
         rows, cols, mines = self.settings_rows, self.settings_cols, self.settings_mines
         self._num_rows = rows
         self._num_cols = cols
@@ -203,6 +199,7 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
                 table_widget.setCellWidget(i, j, label)
 
     def _recurse_uncover(self, row, col):
+        """Recursive uncover for cells in 3x3 area, stop if there are bombs around."""
         table_widget = self.tableWidget
         this_label = table_widget.cellWidget(row, col)
         this_item = this_label.item
@@ -214,8 +211,6 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
         end_row = min(self._num_rows - 1, row + 1)
         start_col = max(0, col - 1)
         end_col = min(self._num_cols - 1, col + 1)
-        # print(f"rows: ({start_row}, {end_row})")
-        # print(f"cols: ({start_col}, {end_col})")
 
         mines_in_area = 0
         coordinates = []
@@ -237,6 +232,7 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
                 self._recurse_uncover(i, j)
 
     def cell_uncover(self, row, col):
+        """Uncover covered cell."""
         if self._game_state != GAME_NONE:
             return
 
@@ -257,6 +253,7 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
                 self._end_game(defeat=False)
 
     def cell_toggle_flag(self, row, col):
+        """Toggle flag on covered cell."""
         if self._game_state != GAME_NONE:
             return
 
@@ -274,6 +271,7 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
         self._emit_flagged_cells()
 
     def _end_game(self, defeat):
+        """Game end."""
         self.timer.stop()
         title = "Info"
         if defeat:
@@ -286,6 +284,7 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
             QtWidgets.QMessageBox.information(self, title, text, QtWidgets.QMessageBox.StandardButton.Ok)
 
     def closeEvent(self, event):
+        """Catch close event and ask confirmation."""
         if QtWidgets.QMessageBox.question(
                 self, "Confirm", "Are you sure you want to exit the program?",
                 QtWidgets.QMessageBox.StandardButton.Yes, QtWidgets.QMessageBox.StandardButton.No
