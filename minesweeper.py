@@ -38,15 +38,20 @@ GAME_DEFEAT = 2
 
 
 class ItemDelegate(QtWidgets.QStyledItemDelegate):
+    """Item delegate for drawing images in fields."""
+
     def __init__(self, parent, table_widget):
+        """Initialize."""
         QtWidgets.QStyledItemDelegate.__init__(self, parent)
         self.table_widget = table_widget
         self.installEventFilter(self)
 
     def createEditor(self, parent, option, index):
+        """Prevent item text editing."""
         return None
 
     def paint(self, painter, option, index):
+        """Paint picture based on code in item text."""
         painter.save()
         text = self.table_widget.item(index.row(), index.column()).text()
         painter.drawImage(option.rect, PICT_DICT[text[0]])
@@ -54,30 +59,35 @@ class ItemDelegate(QtWidgets.QStyledItemDelegate):
 
 
 class CustomLabel(QtWidgets.QLabel):
+    """Custom label for watching button clicks, storing mines number and for other purposes."""
 
     signal_cell_left_btn = QtCore.Signal(int, int)
     signal_cell_right_btn = QtCore.Signal(int, int)
 
     def __init__(self, item, text=None):
+        """Initialize."""
         QtWidgets.QLabel.__init__(self, text)
         self.setAlignment(QtGui.Qt.AlignmentFlag.AlignCenter)
         self.setSizePolicy(QtWidgets.QSizePolicy(
             QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding
         ))
 
-        self.item = item
+        self.item = item  # item in same cell of tableWidget
         if text:
             self.setText(text)
         self.mined = False
         self.installEventFilter(self)
 
     def row(self):
+        """Get row of current cell in tableWidget."""
         return self.item.row()
 
     def column(self):
+        """Get column of current cell in tableWidget."""
         return self.item.column()
 
     def eventFilter(self, watched, event):
+        """Filter mouse button clicks (left for uncover, right for flag)."""
         if (event.type() == QtCore.QEvent.Type.MouseButtonRelease and
                 watched.rect().contains(event.position().toPoint())):
             event_button = event.button()
@@ -88,7 +98,8 @@ class CustomLabel(QtWidgets.QLabel):
 
         return False
 
-    def __repr__(self):
+    def __str__(self):
+        """String object representation for convenience."""
         return f"CustomLabel: row={self.row()}, column={self.column()}, mined={self.mined}, text={self.text()}"
 
 
