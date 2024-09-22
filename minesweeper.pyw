@@ -44,7 +44,6 @@ class ItemDelegate(QtWidgets.QStyledItemDelegate):
         """Initialize."""
         QtWidgets.QStyledItemDelegate.__init__(self, parent)
         self.table_widget = table_widget
-        self.installEventFilter(self)
 
     def createEditor(self, parent, option, index):
         """Prevent item text editing."""
@@ -141,17 +140,17 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
         self.setWindowIcon(QtGui.QIcon(str(BASE_PATH / "images" / "pig.png")))
 
         # Settings
+        # ToDo: create settings storage (.ini file or smth)
         self.settings_rows = 10  # default number of rows
         self.settings_cols = 10  # default number of columns
         self.settings_mines = 12  # default number of mines
 
+        # Init widgets
         self.tableWidget.verticalHeader().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.Stretch)
         self.tableWidget.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.Stretch)
 
         self.item_delegate = ItemDelegate(self.tableWidget.itemDelegate(), self.tableWidget)
         self.tableWidget.setItemDelegate(self.item_delegate)
-
-        self.tableWidget.installEventFilter(self)
 
         self.timer = QtCore.QTimer(self)
         self.timer.timeout.connect(self._timer_job)
@@ -159,7 +158,7 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
         self.action_startNewGame.triggered.connect(self.start_new_game)
         self.action_settings.triggered.connect(self.show_settings_dialog)
 
-        # Inits
+        # Init minesweeper logic
         self._num_rows = 0
         self._num_cols = 0
         self._num_mines = 0
