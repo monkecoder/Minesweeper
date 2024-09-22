@@ -4,7 +4,7 @@ from pathlib import Path
 from types import MappingProxyType
 
 import numpy as np
-from PySide6 import QtCore, QtGui, QtWidgets
+from PySide6 import QtCore, QtGui, QtWidgets, QtTest
 
 from gui.minesweeper_settings_ui import Ui_MinesweeperSettings
 from gui.minesweeper_window_ui import Ui_MinesweeperWindow
@@ -15,7 +15,7 @@ CODE_COVERED = "c"              # cell is covered, default
 CODE_COVERED_FLAG = "f"         # cell is covered, flag
 CODE_UNCOVERED = "u"            # cell is uncovered, default
 CODE_UNCOVERED_MINE = "m"       # cell is uncovered, mine
-CODE_UNCOVERED_MINE_OK = "o"    # cell is uncovered, mine neutralized
+CODE_UNCOVERED_MINE_OK = "o"    # cell is uncovered, mine defused
 CODE_UNCOVERED_MINE_BAD = "b"   # cell is uncovered, mine exploded
 
 PICT_DICT = MappingProxyType({
@@ -292,7 +292,7 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
             return
         if label.mined:
             item.setText(CODE_UNCOVERED_MINE)
-            self._end_game(defeat=True)
+            self._end_game(row, col, defeat=True)
         else:
             self._recurse_uncover(row, col)
             if self._num_rows * self._num_cols - self._uncovered_cells == self._num_mines:
@@ -316,18 +316,90 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
 
         self._emit_flagged_cells()
 
-    def _end_game(self, defeat):
+    def _end_game(self, row=-1, col=-1, *, defeat):
         """Game end."""
         self.timer.stop()
         title = "Info"
         if defeat:
             self._game_state = GAME_DEFEAT
+            self._show_mines_explode(row, col)
             text = "DEFEAT!"
             QtWidgets.QMessageBox.warning(self, title, text, QtWidgets.QMessageBox.StandardButton.Ok)
         else:
             self._game_state = GAME_VICTORY
+            self._show_mines_defused()
             text = "VICTORY!"
             QtWidgets.QMessageBox.information(self, title, text, QtWidgets.QMessageBox.StandardButton.Ok)
+
+    def _show_mines_explode(self, row, col):
+        """Shows all mines exploding."""
+        # serial explodes in increasing square
+        table_widget = self.tableWidget
+
+        rows, cols = table_widget.rowCount(), table_widget.columnCount()
+        max_loops = max(row - 1, rows - row - 1, col - 1, cols - col - 1)
+        # print(max_loops)
+
+        mines_exploded = 0
+
+        def explode_if_exists_and_mined(_row, _col):
+            label = table_widget.cellWidget(_row, _col)
+            if label and label.mined:
+                nonlocal mines_exploded, is_square_mined
+                label.item.setText(CODE_UNCOVERED_MINE_BAD)
+                mines_exploded += 1
+                is_square_mined = True
+
+        # Mine uncovered, wait to explode
+        QtTest.QTest.qWait(100)  # QTimer should be used, but this is much easier
+        explode_if_exists_and_mined(row, col)
+        if self._num_mines == 1:  # return if it was the only one
+            return
+        QtTest.QTest.qWait(100)  # QTimer should be used, but this is much easier
+
+        bias = 1
+        while bias <= max_loops:
+            is_square_mined = False
+            start_row, end_row = row - bias, row + bias
+            start_col, end_col = col - bias, col + bias
+
+            for i in range(start_row, end_row + 1, 1):
+                explode_if_exists_and_mined(i, start_col)
+                explode_if_exists_and_mined(i, end_col)
+
+            for j in range(start_col + 1, end_col, 1):
+                explode_if_exists_and_mined(start_row, j)
+                explode_if_exists_and_mined(end_row, j)
+
+            if mines_exploded == self._num_mines:
+                break
+            if is_square_mined:
+                print("sleep", bias)
+                QtTest.QTest.qWait(100)  # QTimer should be used, but this is much easier
+            bias += 1
+
+
+    def _show_mines_defused(self):
+        """Shows all mines being defused."""
+        # serial defuse from up to down
+        table_widget = self.tableWidget
+        rows, cols = table_widget.rowCount(), table_widget.columnCount()
+
+        mines_defused = 0
+        for i in range(rows):
+            is_row_mined = False
+            for j in range(cols):
+                label = table_widget.cellWidget(i, j)
+                if label.mined:
+                    is_row_mined = True
+                    label.item.setText(CODE_UNCOVERED_MINE_OK)
+                    mines_defused += 1
+            if mines_defused == self._num_mines or i == rows - 1:
+                break
+            if is_row_mined:
+                # print("sleep")
+                QtTest.QTest.qWait(100)  # QTimer should be used, but this is much easier
+
 
     def closeEvent(self, event):
         """Catch close event and ask confirmation."""
