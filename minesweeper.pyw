@@ -252,7 +252,7 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
         if this_item.text() != CODE_COVERED:  # only covered cell can become uncovered
             return
 
-        # call function for 3x3 area
+        # Call function for 3x3 area
         start_row = max(0, row - 1)
         end_row = min(self._num_rows - 1, row + 1)
         start_col = max(0, col - 1)
@@ -332,12 +332,12 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
 
     def _show_mines_explode(self, row, col):
         """Shows all mines exploding."""
-        # serial explodes in increasing square
+        # Serial explodes in increasing square
         table_widget = self.tableWidget
 
         rows, cols = table_widget.rowCount(), table_widget.columnCount()
+        # Calc maximum distance from point to tabWidget border
         max_loops = max(row - 1, rows - row - 1, col - 1, cols - col - 1)
-        # print(max_loops)
 
         mines_exploded = 0
 
@@ -395,7 +395,7 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
 
     def _show_mines_defused(self):
         """Shows all mines being defused."""
-        # serial defuse from up to down
+        # Serial defuse from up to down
         table_widget = self.tableWidget
         rows, cols = table_widget.rowCount(), table_widget.columnCount()
 
