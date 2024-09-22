@@ -54,7 +54,7 @@ class ItemDelegate(QtWidgets.QStyledItemDelegate):
         """Paint picture based on code in item text."""
         painter.save()
         text = self.table_widget.item(index.row(), index.column()).text()
-        painter.drawImage(option.rect, PICT_DICT[text[0]])
+        painter.drawImage(option.rect, PICT_DICT[text])
         painter.restore()
 
 
@@ -185,12 +185,14 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
             self._set_field()
 
     def show_settings_dialog(self):
+        """Show settings dialog."""
         self.settings_dialog.spinBox_rows.setValue(self.settings_rows)
         self.settings_dialog.spinBox_cols.setValue(self.settings_cols)
         self.settings_dialog.spinBox_mines.setValue(self.settings_mines)
         self.settings_dialog.show()
 
     def _update_settings(self):
+        """Update settings if settings dialog was accepted."""
         self.settings_rows = self.settings_dialog.spinBox_rows.value()
         self.settings_cols = self.settings_dialog.spinBox_cols.value()
         self.settings_mines = self.settings_dialog.spinBox_mines.value()
@@ -339,6 +341,7 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
 
 
 def main(sys_argv):
+    """Start minesweeper application."""
     app = QtWidgets.QApplication(sys_argv)
     # app.setStyle(QtWidgets.QStyleFactory.create("Fusion"))
     window = MinesweeperWindow()
