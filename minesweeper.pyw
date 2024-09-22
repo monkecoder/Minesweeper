@@ -287,7 +287,7 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
         item = self.tableWidget.item(row, col)
         label = self.tableWidget.cellWidget(row, col)
         item_text = item.text()
-        if item_text in {CODE_UNCOVERED, CODE_COVERED_FLAG}:  # ignore if already uncovered or flag is set
+        if item_text != CODE_COVERED:  # ignore if not default covered cell
             return
         if label.mined:
             self._end_game(row, col, defeat=True)
