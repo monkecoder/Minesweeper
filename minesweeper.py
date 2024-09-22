@@ -389,7 +389,6 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
                 break
             if square_items:
                 square_items.clear()
-                print("sleep", bias)
                 QtTest.QTest.qWait(100)  # QTimer should be used, but this is much easier
             bias += 1
 
@@ -412,7 +411,6 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
             if mines_defused == self._num_mines or i == rows - 1:
                 break
             if is_row_mined:
-                # print("sleep")
                 QtTest.QTest.qWait(100)  # QTimer should be used, but this is much easier
 
 
