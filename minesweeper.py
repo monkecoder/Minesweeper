@@ -291,7 +291,6 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
         if item_text in {CODE_UNCOVERED, CODE_COVERED_FLAG}:  # ignore if already uncovered or flag is set
             return
         if label.mined:
-            item.setText(CODE_UNCOVERED_MINE)
             self._end_game(row, col, defeat=True)
         else:
             self._recurse_uncover(row, col)
@@ -342,38 +341,54 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
 
         mines_exploded = 0
 
-        def explode_if_exists_and_mined(_row, _col):
+        def get_item(_row, _col):
             label = table_widget.cellWidget(_row, _col)
             if label and label.mined:
-                nonlocal mines_exploded, is_square_mined
-                label.item.setText(CODE_UNCOVERED_MINE_BAD)
+                nonlocal mines_exploded
                 mines_exploded += 1
-                is_square_mined = True
+                return label.item
+            return None
 
         # Mine uncovered, wait to explode
         QtTest.QTest.qWait(100)  # QTimer should be used, but this is much easier
-        explode_if_exists_and_mined(row, col)
-        if self._num_mines == 1:  # return if it was the only one
+        if item := get_item(row, col):
+            item.setText(CODE_UNCOVERED_MINE)
+            QtTest.QTest.qWait(100)  # QTimer should be used, but this is much easier
+            item.setText(CODE_UNCOVERED_MINE_BAD)
+            QtTest.QTest.qWait(100)  # QTimer should be used, but this is much easier
+        if self._num_mines == mines_exploded:  # return if it was the only one
             return
         QtTest.QTest.qWait(100)  # QTimer should be used, but this is much easier
 
+        square_items = []
         bias = 1
         while bias <= max_loops:
-            is_square_mined = False
             start_row, end_row = row - bias, row + bias
             start_col, end_col = col - bias, col + bias
 
             for i in range(start_row, end_row + 1, 1):
-                explode_if_exists_and_mined(i, start_col)
-                explode_if_exists_and_mined(i, end_col)
+                if item := get_item(i, start_col):
+                    square_items.append(item)
+                if item := get_item(i, end_col):
+                    square_items.append(item)
 
             for j in range(start_col + 1, end_col, 1):
-                explode_if_exists_and_mined(start_row, j)
-                explode_if_exists_and_mined(end_row, j)
+                if item := get_item(start_row, j):
+                    square_items.append(item)
+                if item := get_item(end_row, j):
+                    square_items.append(item)
+
+            if square_items:
+                for item in square_items:
+                    item.setText(CODE_UNCOVERED_MINE)
+                QtTest.QTest.qWait(100)  # QTimer should be used, but this is much easier
+                for item in square_items:
+                    item.setText(CODE_UNCOVERED_MINE_BAD)
 
             if mines_exploded == self._num_mines:
                 break
-            if is_square_mined:
+            if square_items:
+                square_items.clear()
                 print("sleep", bias)
                 QtTest.QTest.qWait(100)  # QTimer should be used, but this is much easier
             bias += 1
