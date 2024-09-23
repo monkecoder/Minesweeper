@@ -49,16 +49,16 @@ class Ui_MinesweeperWindow(object):
 
         self.horizontalLayout.addWidget(self.lineEdit_cellsUncovered)
 
-        self.label_minesFlagged = QLabel(self.centralwidget)
-        self.label_minesFlagged.setObjectName(u"label_minesFlagged")
+        self.label_cellsFlagged = QLabel(self.centralwidget)
+        self.label_cellsFlagged.setObjectName(u"label_cellsFlagged")
 
-        self.horizontalLayout.addWidget(self.label_minesFlagged)
+        self.horizontalLayout.addWidget(self.label_cellsFlagged)
 
-        self.lineEdit_minesFlagged = QLineEdit(self.centralwidget)
-        self.lineEdit_minesFlagged.setObjectName(u"lineEdit_minesFlagged")
-        self.lineEdit_minesFlagged.setReadOnly(True)
+        self.lineEdit_cellsFlagged = QLineEdit(self.centralwidget)
+        self.lineEdit_cellsFlagged.setObjectName(u"lineEdit_cellsFlagged")
+        self.lineEdit_cellsFlagged.setReadOnly(True)
 
-        self.horizontalLayout.addWidget(self.lineEdit_minesFlagged)
+        self.horizontalLayout.addWidget(self.lineEdit_cellsFlagged)
 
         self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
@@ -93,8 +93,8 @@ class Ui_MinesweeperWindow(object):
         self.menu_help = QMenu(self.menubar)
         self.menu_help.setObjectName(u"menu_help")
         MinesweeperWindow.setMenuBar(self.menubar)
-        QWidget.setTabOrder(self.lineEdit_cellsUncovered, self.lineEdit_minesFlagged)
-        QWidget.setTabOrder(self.lineEdit_minesFlagged, self.timeEdit_timer)
+        QWidget.setTabOrder(self.lineEdit_cellsUncovered, self.lineEdit_cellsFlagged)
+        QWidget.setTabOrder(self.lineEdit_cellsFlagged, self.timeEdit_timer)
         QWidget.setTabOrder(self.timeEdit_timer, self.tableWidget)
 
         self.menubar.addAction(self.menu_settings.menuAction())
@@ -115,7 +115,7 @@ class Ui_MinesweeperWindow(object):
         self.action_settings.setText(QCoreApplication.translate("MinesweeperWindow", u"Settings", None))
         self.action_aboutProgram.setText(QCoreApplication.translate("MinesweeperWindow", u"About program", None))
         self.label_cellsUncovered.setText(QCoreApplication.translate("MinesweeperWindow", u"Uncovered cells:", None))
-        self.label_minesFlagged.setText(QCoreApplication.translate("MinesweeperWindow", u"Flagged mines:", None))
+        self.label_cellsFlagged.setText(QCoreApplication.translate("MinesweeperWindow", u"Flagged cells:", None))
         self.label_timer.setText(QCoreApplication.translate("MinesweeperWindow", u"Timer", None))
         self.timeEdit_timer.setDisplayFormat(QCoreApplication.translate("MinesweeperWindow", u"mm:ss", None))
         self.menu_settings.setTitle(QCoreApplication.translate("MinesweeperWindow", u"Game", None))

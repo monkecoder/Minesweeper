@@ -46,6 +46,12 @@ class Ui_MinesweeperSettings(object):
         self.spinBox_mines = QSpinBox(MinesweeperSettings)
         self.spinBox_mines.setObjectName(u"spinBox_mines")
         self.spinBox_mines.setGeometry(QRect(140, 90, 42, 22))
+        self.label_animationPeriod = QLabel(MinesweeperSettings)
+        self.label_animationPeriod.setObjectName(u"label_animationPeriod")
+        self.label_animationPeriod.setGeometry(QRect(20, 130, 111, 21))
+        self.spinBox_animationPeriod = QSpinBox(MinesweeperSettings)
+        self.spinBox_animationPeriod.setObjectName(u"spinBox_animationPeriod")
+        self.spinBox_animationPeriod.setGeometry(QRect(140, 130, 42, 22))
 
         self.retranslateUi(MinesweeperSettings)
         self.buttonBox.accepted.connect(MinesweeperSettings.accept)
@@ -59,5 +65,6 @@ class Ui_MinesweeperSettings(object):
         self.label_rows.setText(QCoreApplication.translate("MinesweeperSettings", u"Rows (height):", None))
         self.label_cols.setText(QCoreApplication.translate("MinesweeperSettings", u"Columns (width):", None))
         self.label_mines.setText(QCoreApplication.translate("MinesweeperSettings", u"Mines:", None))
+        self.label_animationPeriod.setText(QCoreApplication.translate("MinesweeperSettings", u"Animation period", None))
     # retranslateUi
 

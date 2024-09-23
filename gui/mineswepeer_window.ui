@@ -32,14 +32,14 @@
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="label_minesFlagged">
+       <widget class="QLabel" name="label_cellsFlagged">
         <property name="text">
-         <string>Flagged mines:</string>
+         <string>Flagged cells:</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="lineEdit_minesFlagged">
+       <widget class="QLineEdit" name="lineEdit_cellsFlagged">
         <property name="readOnly">
          <bool>true</bool>
         </property>
@@ -129,7 +129,7 @@
  </widget>
  <tabstops>
   <tabstop>lineEdit_cellsUncovered</tabstop>
-  <tabstop>lineEdit_minesFlagged</tabstop>
+  <tabstop>lineEdit_cellsFlagged</tabstop>
   <tabstop>timeEdit_timer</tabstop>
   <tabstop>tableWidget</tabstop>
  </tabstops>

@@ -114,6 +114,8 @@ class MinesweeperSettings(QtWidgets.QDialog, Ui_MinesweeperSettings):
         self.spinBox_cols.setMinimum(4)
         self.spinBox_rows.setMaximum(50)
         self.spinBox_mines.setMinimum(1)
+        self.spinBox_animationPeriod.setMinimum(0)
+        self.spinBox_animationPeriod.setMaximum(200)
 
         self.spinBox_rows.valueChanged.connect(self.check_max_mines)
         self.spinBox_cols.valueChanged.connect(self.check_max_mines)
@@ -144,6 +146,7 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
         self.settings_rows = 10  # default number of rows
         self.settings_cols = 10  # default number of columns
         self.settings_mines = 12  # default number of mines
+        self.settings_animation_period = 75  # period
 
         # Init widgets
         self.tableWidget.verticalHeader().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.Stretch)
@@ -157,6 +160,10 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
 
         self.action_startNewGame.triggered.connect(self.start_new_game)
         self.action_settings.triggered.connect(self.show_settings_dialog)
+
+        self.lineEdit_cellsUncovered.setToolTip("Uncovered cells / not mined cells")
+        self.lineEdit_cellsFlagged.setToolTip("Flagged cells / mined cells")
+        self.timeEdit_timer.setToolTip("Time elapsed since start (min:sec)")
 
         # Init minesweeper logic
         self._num_rows = 0
@@ -188,6 +195,7 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
         self.settings_dialog.spinBox_rows.setValue(self.settings_rows)
         self.settings_dialog.spinBox_cols.setValue(self.settings_cols)
         self.settings_dialog.spinBox_mines.setValue(self.settings_mines)
+        self.settings_dialog.spinBox_animationPeriod.setValue(self.settings_animation_period)
         self.settings_dialog.show()
 
     def _update_settings(self):
@@ -195,6 +203,10 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
         self.settings_rows = self.settings_dialog.spinBox_rows.value()
         self.settings_cols = self.settings_dialog.spinBox_cols.value()
         self.settings_mines = self.settings_dialog.spinBox_mines.value()
+        self.settings_animation_period = self.settings_dialog.spinBox_animationPeriod.value()
+
+    def _animation_sleep(self):
+        QtTest.QTest.qWait(self.settings_animation_period)  # QTimer should be used, but this is much easier
 
     def _emit_uncovered_cells(self):
         """Update data for lineEdit_cellsUncovered widget."""
@@ -202,9 +214,8 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
                                              f"{self._num_rows * self._num_cols - self._num_mines}")
 
     def _emit_flagged_cells(self):
-        """Update data for lineEdit_minesFlagged widget."""
-        flagged_bombs = min(self._num_mines, self._flagged_cells)
-        self.lineEdit_minesFlagged.setText(f"{flagged_bombs}/{self._num_mines}")
+        """Update data for lineEdit_cellsFlagged widget."""
+        self.lineEdit_cellsFlagged.setText(f"{self._flagged_cells}/{self._num_mines}")
 
     def _set_field(self):
         """Init field with size specified in settings (start a new game)."""
@@ -348,16 +359,13 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
                 return label.item
             return None
 
-        # Mine uncovered, wait to explode
-        QtTest.QTest.qWait(100)  # QTimer should be used, but this is much easier
         if item := get_item(row, col):
             item.setText(CODE_UNCOVERED_MINE)
-            QtTest.QTest.qWait(100)  # QTimer should be used, but this is much easier
+            self._animation_sleep()
             item.setText(CODE_UNCOVERED_MINE_BAD)
-            QtTest.QTest.qWait(100)  # QTimer should be used, but this is much easier
         if self._num_mines == mines_exploded:  # return if it was the only one
             return
-        QtTest.QTest.qWait(100)  # QTimer should be used, but this is much easier
+        self._animation_sleep()
 
         square_items = []
         bias = 1
@@ -380,7 +388,7 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
             if square_items:
                 for item in square_items:
                     item.setText(CODE_UNCOVERED_MINE)
-                QtTest.QTest.qWait(100)  # QTimer should be used, but this is much easier
+                self._animation_sleep()
                 for item in square_items:
                     item.setText(CODE_UNCOVERED_MINE_BAD)
 
@@ -388,9 +396,8 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
                 break
             if square_items:
                 square_items.clear()
-                QtTest.QTest.qWait(100)  # QTimer should be used, but this is much easier
+                self._animation_sleep()
             bias += 1
-
 
     def _show_mines_defused(self):
         """Shows all mines being defused."""
@@ -410,8 +417,7 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
             if mines_defused == self._num_mines or i == rows - 1:
                 break
             if is_row_mined:
-                QtTest.QTest.qWait(100)  # QTimer should be used, but this is much easier
-
+                self._animation_sleep()
 
     def closeEvent(self, event):
         """Catch close event and ask confirmation."""
