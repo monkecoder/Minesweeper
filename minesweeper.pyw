@@ -225,7 +225,7 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
         table_widget.setColumnCount(cols)
 
         mines_preset = np.full(rows * cols, False)
-        rand_choices = np.random.randint(rows * cols, size=mines)
+        rand_choices = np.random.choice(range(rows * cols), size=mines, replace=False)
         for choice in rand_choices:
             mines_preset[choice] = True
         mines_preset = mines_preset.reshape(rows, cols)
