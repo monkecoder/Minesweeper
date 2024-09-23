@@ -161,8 +161,10 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
         self.action_startNewGame.triggered.connect(self.start_new_game)
         self.action_settings.triggered.connect(self.show_settings_dialog)
 
-        self.lineEdit_cellsUncovered.setToolTip("Uncovered cells / not mined cells")
-        self.lineEdit_cellsFlagged.setToolTip("Flagged cells / mined cells")
+        for widget in (self.lcdNumber_cellsUncovered, self.label, self.lcdNumber_cellsNotMined):
+            widget.setToolTip("Uncovered cells / Not mined cells")
+        for widget in (self.lcdNumber_cellsFlagged, self.label_2, self.lcdNumber_cellsMined):
+            widget.setToolTip("Flagged cells / Mined cells")
         self.timeEdit_timer.setToolTip("Time elapsed since start (min:sec)")
 
         # Init minesweeper logic
@@ -210,12 +212,11 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
 
     def _emit_uncovered_cells(self):
         """Update data for lineEdit_cellsUncovered widget."""
-        self.lineEdit_cellsUncovered.setText(f"{self._uncovered_cells}/"
-                                             f"{self._num_rows * self._num_cols - self._num_mines}")
+        self.lcdNumber_cellsUncovered.display(self._uncovered_cells)
 
     def _emit_flagged_cells(self):
         """Update data for lineEdit_cellsFlagged widget."""
-        self.lineEdit_cellsFlagged.setText(f"{self._flagged_cells}/{self._num_mines}")
+        self.lcdNumber_cellsFlagged.display(self._flagged_cells)
 
     def _set_field(self):
         """Init field with size specified in settings (start a new game)."""
@@ -228,6 +229,8 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
         self._flagged_cells = 0
         self.timer.stop()
         self.timeEdit_timer.setTime(QtCore.QTime(0, 0, 0, 0))
+        self.lcdNumber_cellsNotMined.display(self._num_rows * self._num_cols - self._num_mines)
+        self.lcdNumber_cellsMined.display(self._num_mines)
         self._emit_uncovered_cells()
         self._emit_flagged_cells()
 
