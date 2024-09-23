@@ -147,6 +147,9 @@
          </property>
          <item>
           <widget class="QTimeEdit" name="timeEdit_timer">
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
+           </property>
            <property name="frame">
             <bool>false</bool>
            </property>

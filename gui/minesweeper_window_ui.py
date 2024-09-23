@@ -115,6 +115,7 @@ class Ui_MinesweeperWindow(object):
         self.verticalLayout_2.setContentsMargins(1, 1, 1, 1)
         self.timeEdit_timer = QTimeEdit(self.frame_timer)
         self.timeEdit_timer.setObjectName(u"timeEdit_timer")
+        self.timeEdit_timer.setFocusPolicy(Qt.NoFocus)
         self.timeEdit_timer.setFrame(False)
         self.timeEdit_timer.setReadOnly(True)
         self.timeEdit_timer.setButtonSymbols(QAbstractSpinBox.NoButtons)

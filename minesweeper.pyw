@@ -166,7 +166,8 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
         for widget in (self.lcdNumber_cellsFlagged, self.label_2, self.lcdNumber_cellsMined):
             widget.setToolTip("Flagged cells / Mined cells")
         self.timeEdit_timer.setToolTip("Time elapsed since start (min:sec)")
-        self.timeEdit_timer.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
+
+        self.timeEdit_timer.lineEdit().installEventFilter(self)
 
         # Init minesweeper logic
         self._num_rows = 0
@@ -422,6 +423,12 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
                 break
             if is_row_mined:
                 self._animation_sleep()
+
+    def eventFilter(self, watched, event):
+        """Event filter for timeEdit_timer widget, ignore all mouse events."""
+        if isinstance(event, QtGui.QMouseEvent):
+            return True
+        return False
 
     def closeEvent(self, event):
         """Catch close event and ask confirmation."""
