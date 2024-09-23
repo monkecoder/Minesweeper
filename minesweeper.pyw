@@ -28,8 +28,9 @@ PICT_DICT = MappingProxyType({
 })
 
 GAME_NONE = 0
-GAME_VICTORY = 1
-GAME_DEFEAT = 2
+GAME_BLOCK = 1
+GAME_VICTORY = 2
+GAME_DEFEAT = 3
 
 # idk why, but pixmap crushes program execution (Process finished with exit code -1073741819 (0xC0000005))
 # TEST_PIXMAP = QtGui.QPixmap()
@@ -169,12 +170,20 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
 
         self.timeEdit_timer.lineEdit().installEventFilter(self)
 
+        # Init shortcuts
+        self.shortcut_startNewGame = QtGui.QShortcut(QtGui.QKeySequence("Alt+N"), self,
+                                                     self.action_startNewGame.trigger)
+        self.shortcut_settings = QtGui.QShortcut(QtGui.QKeySequence("Alt+S"), self,
+                                                 self.action_settings.trigger)
+        self.shortcut_aboutProgram = QtGui.QShortcut(QtGui.QKeySequence("Alt+H"), self,
+                                                     self.action_aboutProgram.trigger)
+
         # Init minesweeper logic
         self._num_rows = 0
         self._num_cols = 0
         self._num_mines = 0
         self._mines_preset = None
-        self._game_state = GAME_NONE
+        self._game_state = GAME_BLOCK
         self._uncovered_cells = 0
         self._flagged_cells = 0
 
@@ -187,6 +196,8 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
 
     def start_new_game(self):
         """Start a new game."""
+        if self._game_state == GAME_BLOCK:
+            return
         # ask only after game started
         if not self._uncovered_cells or self._game_state != GAME_NONE or QtWidgets.QMessageBox.question(
             self, "Confirm", "Are you sure you want to start a new game?",
@@ -332,18 +343,19 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
 
     def _end_game(self, row=-1, col=-1, *, defeat):
         """Game end."""
+        self._game_state = GAME_BLOCK
         self.timer.stop()
         title = "Info"
         if defeat:
-            self._game_state = GAME_DEFEAT
             self._show_mines_explode(row, col)
             text = "DEFEAT!"
             QtWidgets.QMessageBox.warning(self, title, text, QtWidgets.QMessageBox.StandardButton.Ok)
+            self._game_state = GAME_DEFEAT
         else:
-            self._game_state = GAME_VICTORY
             self._show_mines_defused()
             text = "VICTORY!"
             QtWidgets.QMessageBox.information(self, title, text, QtWidgets.QMessageBox.StandardButton.Ok)
+            self._game_state = GAME_VICTORY
 
     def _show_mines_explode(self, row, col):
         """Shows all mines exploding."""
