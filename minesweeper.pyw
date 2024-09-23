@@ -161,11 +161,12 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
         self.action_startNewGame.triggered.connect(self.start_new_game)
         self.action_settings.triggered.connect(self.show_settings_dialog)
 
-        for widget in (self.lcdNumber_cellsUncovered, self.label, self.lcdNumber_cellsNotMined):
+        for widget in (self.lcdNumber_cellsUncovered, self.label_1, self.lcdNumber_cellsNotMined):
             widget.setToolTip("Uncovered cells / Not mined cells")
         for widget in (self.lcdNumber_cellsFlagged, self.label_2, self.lcdNumber_cellsMined):
             widget.setToolTip("Flagged cells / Mined cells")
         self.timeEdit_timer.setToolTip("Time elapsed since start (min:sec)")
+        self.timeEdit_timer.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
 
         # Init minesweeper logic
         self._num_rows = 0
