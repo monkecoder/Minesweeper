@@ -171,12 +171,9 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
         self.timeEdit_timer.lineEdit().installEventFilter(self)
 
         # Init shortcuts
-        self.shortcut_startNewGame = QtGui.QShortcut(QtGui.QKeySequence("Alt+N"), self,
-                                                     self.action_startNewGame.trigger)
-        self.shortcut_settings = QtGui.QShortcut(QtGui.QKeySequence("Alt+S"), self,
-                                                 self.action_settings.trigger)
-        self.shortcut_aboutProgram = QtGui.QShortcut(QtGui.QKeySequence("Alt+H"), self,
-                                                     self.action_aboutProgram.trigger)
+        self.action_startNewGame.setShortcut(QtGui.QKeySequence("Alt+N"))
+        self.action_settings.setShortcut(QtGui.QKeySequence("Alt+S"))
+        self.action_aboutProgram.setShortcut(QtGui.QKeySequence("Alt+H"))
 
         # Init minesweeper logic
         self._num_rows = 0
