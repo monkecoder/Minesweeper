@@ -151,6 +151,7 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
         self.tableWidget.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.Stretch)
 
         self.tableWidget.cellClicked.connect(self.cell_uncover)
+        self.tableWidget.keyPressEvent = self.tableKeyPressEvent
 
         self.item_delegate = ItemDelegate(self.tableWidget.itemDelegate(), self.tableWidget)
         self.tableWidget.setItemDelegate(self.item_delegate)
@@ -430,6 +431,19 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
                 break
             if is_row_mined:
                 self._animation_sleep()
+
+    def tableKeyPressEvent(self, event):
+        """Reimplementation of keyPressEvent for tableWidget, handles key pressing."""
+        if event.key() in {QtCore.Qt.Key.Key_Space, QtCore.Qt.Key.Key_Return, QtCore.Qt.Key.Key_Enter}:
+            item = self.tableWidget.currentItem()
+            self.tableWidget.cellClicked.emit(item.row(), item.column())
+        elif event.key() == QtCore.Qt.Key.Key_Backspace:
+            table_widget = self.tableWidget
+            row, col = table_widget.currentRow(), table_widget.currentColumn()
+            label = table_widget.cellWidget(row, col)
+            label.signal_cell_right_btn.emit(row, col)
+
+        QtWidgets.QTableWidget.keyPressEvent(self.tableWidget, event)
 
     def eventFilter(self, watched, event):
         """Event filter for timeEdit_timer widget, ignore all mouse events."""
