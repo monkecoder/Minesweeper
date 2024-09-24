@@ -59,9 +59,8 @@ class ItemDelegate(QtWidgets.QStyledItemDelegate):
 
 
 class CustomLabel(QtWidgets.QLabel):
-    """Custom label for watching button clicks, storing mines number and for other purposes."""
+    """Custom label for watching cell clicks, storing mines number and for other purposes."""
 
-    signal_cell_left_btn = QtCore.Signal(int, int)
     signal_cell_right_btn = QtCore.Signal(int, int)
 
     def __init__(self, item, text=None):
@@ -91,9 +90,7 @@ class CustomLabel(QtWidgets.QLabel):
         if (event.type() == QtCore.QEvent.Type.MouseButtonRelease and
                 watched.rect().contains(event.position().toPoint())):
             event_button = event.button()
-            if event_button == QtCore.Qt.MouseButton.LeftButton:
-                self.signal_cell_left_btn.emit(watched.row(), watched.column())
-            elif event_button == QtCore.Qt.MouseButton.RightButton:
+            if event_button == QtCore.Qt.MouseButton.RightButton:
                 self.signal_cell_right_btn.emit(watched.row(), watched.column())
 
         return False
@@ -152,6 +149,8 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
         # Init widgets
         self.tableWidget.verticalHeader().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.Stretch)
         self.tableWidget.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.Stretch)
+
+        self.tableWidget.cellClicked.connect(self.cell_uncover)
 
         self.item_delegate = ItemDelegate(self.tableWidget.itemDelegate(), self.tableWidget)
         self.tableWidget.setItemDelegate(self.item_delegate)
@@ -262,7 +261,6 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
                 table_widget.setItem(i, j, item)
 
                 label = CustomLabel(item)
-                label.signal_cell_left_btn.connect(self.cell_uncover)
                 label.signal_cell_right_btn.connect(self.cell_toggle_flag)
                 label.mined = mines_preset[i][j]
                 table_widget.setCellWidget(i, j, label)
