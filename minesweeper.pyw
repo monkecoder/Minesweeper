@@ -1,5 +1,6 @@
 """Minesweeper game based on PySide6."""
 
+from configparser import ConfigParser
 from pathlib import Path
 from types import MappingProxyType
 
@@ -36,6 +37,145 @@ GAME_DEFEAT = 3
 # TEST_PIXMAP = QtGui.QPixmap()
 # TEST_PIXMAP.load("BigFruit.png")
 # TEST_PIXMAP.fromImage(PICT_DICT[CELL_COVERED])
+
+DEFAULT_CONFIG_PATH = BASE_PATH / "minesweeper.ini"
+DEFAULT_ROW_COUNT = 10
+DEFAULT_COL_COUNT = 10
+DEFAULT_MINE_COUNT = 12
+
+MIN_ROWS = 4
+MAX_ROWS = 30
+MIN_COLS = 4
+MAX_COLS = 30
+
+
+class MinesweeperConfig:
+    """Class for saving/loading minesweeper settings configuration."""
+
+    def __init__(self):
+        """Constructor."""
+        self._config = ConfigParser()
+        self._last_path = None
+
+    @property
+    def config(self):
+        """Get dict representation of current config."""
+        return {section: dict(self._config.items(section)) for section in self._config.sections()}
+
+    @property
+    def last_path(self):
+        """Get last path of the config file."""
+        return self._last_path
+
+    def _create_section_if_not_exist(self, section):
+        if not self._config.has_section(section):
+            self._config.add_section(section)
+
+    def _remove_section_if_empty(self, section):
+        if self._config.has_section(section) and not self._config.options(section):
+            self._config.remove_section(section)
+
+    def _fix_mines_value(self):
+        max_mines = self.rows * self.cols - 1
+        if self.mines > max_mines:
+            self.mines = max_mines
+
+    def load_config(self, path=None):
+        """Load config from .ini file."""
+        if not path:
+            path = self._last_path if self._last_path else DEFAULT_CONFIG_PATH
+
+        self._config.read(path)
+        rows, cols, mines = self.rows, self.cols, self.mines
+        if not (MIN_ROWS <= rows <= MAX_ROWS):
+            msg = f"Error in config file: rows must be between {MIN_ROWS} and {MAX_ROWS}"
+            raise ValueError(msg)
+        if not (MIN_ROWS <= cols <= MAX_ROWS):
+            msg = f"Error in config file: cols must be between {MIN_COLS} and {MAX_COLS}"
+            raise ValueError(msg)
+        min_mines = 1
+        max_mines = rows * cols - 1
+        if not (min_mines <= mines <= max_mines):
+            msg = f"Error in config file: mines must be between {min_mines} and {max_mines}"
+            raise ValueError(msg)
+        self._last_path = path
+
+    def save_config(self, path=None):
+        """Save config into .ini file."""
+        if not path:
+            path = self._last_path if self._last_path else DEFAULT_CONFIG_PATH
+
+        with open(path, "w") as cfg_file:
+            self._config.write(cfg_file)
+        self._last_path = path
+
+    @property
+    def rows(self):
+        """Get rows setting."""
+        return self._config.getint("ALL", "rows", fallback=DEFAULT_ROW_COUNT)
+
+    @rows.setter
+    def rows(self, value: int):
+        """Set rows setting."""
+        if not (MIN_ROWS <= value <= MAX_ROWS):
+            msg = f"Error while setting value: rows must be between {MIN_ROWS} and {MAX_ROWS}"
+            raise ValueError(msg)
+        self._create_section_if_not_exist("ALL")
+        self._config.set("ALL", "rows", str(value))
+        self._fix_mines_value()
+
+    @rows.deleter
+    def rows(self):
+        """Restore rows setting to default."""
+        self._config.remove_option("ALL", "rows")
+        self._fix_mines_value()
+        self._remove_section_if_empty("ALL")
+
+    @property
+    def cols(self):
+        """Get cols setting."""
+        return self._config.getint("ALL", "cols", fallback=DEFAULT_COL_COUNT)
+
+    @cols.setter
+    def cols(self, value: int):
+        """Set cols setting."""
+        if not (MIN_ROWS <= value <= MAX_ROWS):
+            msg = f"Error while setting value: cols must be between {MIN_COLS} and {MAX_COLS}"
+            raise ValueError(msg)
+        self._create_section_if_not_exist("ALL")
+        self._config.set("ALL", "cols", str(value))
+        self._fix_mines_value()
+
+    @cols.deleter
+    def cols(self):
+        """Restore cols setting to default."""
+        self._config.remove_option("ALL", "cols")
+        self._fix_mines_value()
+        self._remove_section_if_empty("ALL")
+
+    @property
+    def mines(self):
+        """Get mines setting."""
+        return self._config.getint("ALL", "mines", fallback=DEFAULT_MINE_COUNT)
+
+    @mines.setter
+    def mines(self, value: int):
+        """Set mines setting."""
+        min_mines = 1
+        max_mines = self.rows * self.cols - 1
+        if not (min_mines <= value <= max_mines):
+            msg = f"Error while setting value: mines must be between {min_mines} and {max_mines}"
+            raise ValueError(msg)
+        self._create_section_if_not_exist("ALL")
+        self._config.set("ALL", "mines", str(value))
+        self._fix_mines_value()
+
+    @mines.deleter
+    def mines(self):
+        """Restore mines setting to default."""
+        self._config.remove_option("ALL", "mines")
+        self._fix_mines_value()
+        self._remove_section_if_empty("ALL")
 
 
 class ItemDelegate(QtWidgets.QStyledItemDelegate):
@@ -107,10 +247,10 @@ class MinesweeperSettings(QtWidgets.QDialog, Ui_MinesweeperSettings):
         """Initialize minesweeper settings dialog."""
         QtWidgets.QDialog.__init__(self, parent, QtCore.Qt.WindowType.Dialog)
         self.setupUi(self)
-        self.spinBox_rows.setMinimum(4)
-        self.spinBox_rows.setMaximum(30)
-        self.spinBox_cols.setMinimum(4)
-        self.spinBox_cols.setMaximum(30)
+        self.spinBox_rows.setMinimum(MIN_ROWS)
+        self.spinBox_rows.setMaximum(MAX_ROWS)
+        self.spinBox_cols.setMinimum(MIN_COLS)
+        self.spinBox_cols.setMaximum(MAX_COLS)
         self.spinBox_mines.setMinimum(1)
         self.spinBox_animationPeriod.setMinimum(0)
         self.spinBox_animationPeriod.setMaximum(200)
@@ -140,10 +280,11 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
         self.setWindowIcon(QtGui.QIcon(str(BASE_PATH / "images" / "pig.png")))
 
         # Settings
-        # ToDo: create settings storage (.ini file or smth)
-        self.settings_rows = 10  # default number of rows
-        self.settings_cols = 10  # default number of columns
-        self.settings_mines = 12  # default number of mines
+        self._config = MinesweeperConfig()
+        self._config.load_config()
+        self.settings_rows = self._config.rows  # default number of rows
+        self.settings_cols = self._config.cols  # default number of columns
+        self.settings_mines = self._config.mines  # default number of mines
         self.settings_animation_period = 75  # period
 
         # Init widgets
@@ -216,6 +357,9 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
         self.settings_cols = self.settings_dialog.spinBox_cols.value()
         self.settings_mines = self.settings_dialog.spinBox_mines.value()
         self.settings_animation_period = self.settings_dialog.spinBox_animationPeriod.value()
+        self._config.rows = self.settings_rows
+        self._config.cols = self.settings_cols
+        self._config.mines = self.settings_mines
         if not self._uncovered_cells or self._game_state != GAME_RUNNING:
             self._set_field()
 
@@ -269,7 +413,7 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
                 table_widget.setCellWidget(i, j, label)
 
     def _recurse_uncover(self, row, col):
-        """Recursive uncover for cells in 3x3 area, stop if there are bombs around."""
+        """Recursive uncover for cells in 3x3 area, stop if there are mines around."""
         table_widget = self.tableWidget
         this_label = table_widget.cellWidget(row, col)
         this_item = this_label.item
@@ -459,6 +603,7 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
                 self, "Confirm", "Are you sure you want to exit the program?",
                 QtWidgets.QMessageBox.StandardButton.Yes, QtWidgets.QMessageBox.StandardButton.No
         ) == QtWidgets.QMessageBox.StandardButton.Yes:
+            self._config.save_config()
             event.accept()
         else:
             event.ignore()
