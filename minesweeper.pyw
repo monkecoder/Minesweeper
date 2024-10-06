@@ -42,11 +42,14 @@ DEFAULT_CONFIG_PATH = BASE_PATH / "minesweeper.ini"
 DEFAULT_ROW_COUNT = 10
 DEFAULT_COL_COUNT = 10
 DEFAULT_MINE_COUNT = 12
+DEFAULT_ANIMATION_PERIOD = 75
 
 MIN_ROWS = 4
 MAX_ROWS = 30
 MIN_COLS = 4
 MAX_COLS = 30
+MIN_ANIMATION_PERIOD = 0
+MAX_ANIMATION_PERIOD = 250
 
 
 class MinesweeperConfig:
@@ -86,12 +89,16 @@ class MinesweeperConfig:
             path = self._last_path if self._last_path else DEFAULT_CONFIG_PATH
 
         self._config.read(path)
-        rows, cols, mines = self.rows, self.cols, self.mines
+        rows, cols, mines, animation_period = self.rows, self.cols, self.mines, self.animation_period
         if not (MIN_ROWS <= rows <= MAX_ROWS):
             msg = f"Error in config file: rows must be between {MIN_ROWS} and {MAX_ROWS}"
             raise ValueError(msg)
         if not (MIN_ROWS <= cols <= MAX_ROWS):
             msg = f"Error in config file: cols must be between {MIN_COLS} and {MAX_COLS}"
+            raise ValueError(msg)
+        if not (MIN_ANIMATION_PERIOD <= animation_period <= MAX_ANIMATION_PERIOD):
+            msg = (f"Error in config file: animation period must be between "
+                   f"{MIN_ANIMATION_PERIOD} and {MAX_ANIMATION_PERIOD}")
             raise ValueError(msg)
         min_mines = 1
         max_mines = rows * cols - 1
@@ -168,13 +175,32 @@ class MinesweeperConfig:
             raise ValueError(msg)
         self._create_section_if_not_exist("ALL")
         self._config.set("ALL", "mines", str(value))
-        self._fix_mines_value()
 
     @mines.deleter
     def mines(self):
         """Restore mines setting to default."""
         self._config.remove_option("ALL", "mines")
-        self._fix_mines_value()
+        self._remove_section_if_empty("ALL")
+
+    @property
+    def animation_period(self):
+        """Get animation_period setting."""
+        return self._config.getint("ALL", "animation_period", fallback=DEFAULT_ANIMATION_PERIOD)
+
+    @animation_period.setter
+    def animation_period(self, value: int):
+        """Set animation_period setting."""
+        if not (MIN_ROWS <= value <= MAX_ROWS):
+            msg = (f"Error while setting value: animation period must be between "
+                   f"{MIN_ANIMATION_PERIOD} and {MAX_ANIMATION_PERIOD}")
+            raise ValueError(msg)
+        self._create_section_if_not_exist("ALL")
+        self._config.set("ALL", "animation_period", str(value))
+
+    @animation_period.deleter
+    def animation_period(self):
+        """Restore animation_period setting to default."""
+        self._config.remove_option("ALL", "animation_period")
         self._remove_section_if_empty("ALL")
 
 
@@ -252,8 +278,8 @@ class MinesweeperSettings(QtWidgets.QDialog, Ui_MinesweeperSettings):
         self.spinBox_cols.setMinimum(MIN_COLS)
         self.spinBox_cols.setMaximum(MAX_COLS)
         self.spinBox_mines.setMinimum(1)
-        self.spinBox_animationPeriod.setMinimum(0)
-        self.spinBox_animationPeriod.setMaximum(200)
+        self.spinBox_animationPeriod.setMinimum(MIN_ANIMATION_PERIOD)
+        self.spinBox_animationPeriod.setMaximum(MAX_ANIMATION_PERIOD)
 
         self.spinBox_rows.valueChanged.connect(self.check_max_mines)
         self.spinBox_cols.valueChanged.connect(self.check_max_mines)
@@ -285,7 +311,7 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
         self.settings_rows = self._config.rows  # default number of rows
         self.settings_cols = self._config.cols  # default number of columns
         self.settings_mines = self._config.mines  # default number of mines
-        self.settings_animation_period = 75  # period
+        self.settings_animation_period = self._config.animation_period  # animation period
 
         # Init widgets
         self.tableWidget.verticalHeader().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.Stretch)
@@ -360,6 +386,7 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
         self._config.rows = self.settings_rows
         self._config.cols = self.settings_cols
         self._config.mines = self.settings_mines
+        self._config.animation_period = self.settings_animation_period
         if not self._uncovered_cells or self._game_state != GAME_RUNNING:
             self._set_field()
 
