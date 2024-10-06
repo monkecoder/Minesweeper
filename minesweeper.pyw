@@ -11,31 +11,31 @@ from gui.minesweeper_window_ui import Ui_MinesweeperWindow
 
 BASE_PATH = Path(__file__).parent
 
-CODE_COVERED = "c"              # cell is covered, default
-CODE_COVERED_FLAG = "f"         # cell is covered, flag
-CODE_UNCOVERED = "u"            # cell is uncovered, default
-CODE_UNCOVERED_MINE = "m"       # cell is uncovered, mine
-CODE_UNCOVERED_MINE_OK = "o"    # cell is uncovered, mine defused
-CODE_UNCOVERED_MINE_BAD = "b"   # cell is uncovered, mine exploded
+CELL_COVERED = "c"              # cell is covered, default
+CELL_COVERED_FLAG = "f"         # cell is covered, flag
+CELL_UNCOVERED = "u"            # cell is uncovered, default
+CELL_UNCOVERED_MINE = "m"       # cell is uncovered, mine
+CELL_UNCOVERED_MINE_OK = "o"    # cell is uncovered, mine defused
+CELL_UNCOVERED_MINE_BAD = "b"   # cell is uncovered, mine exploded
 
 PICT_DICT = MappingProxyType({
-    CODE_COVERED:            QtGui.QImage(BASE_PATH / "images" / "cell_white.png"),
-    CODE_UNCOVERED:          QtGui.QImage(),
-    CODE_COVERED_FLAG:       QtGui.QImage(BASE_PATH / "images" / "cell_flag_white.png"),
-    CODE_UNCOVERED_MINE:     QtGui.QImage(BASE_PATH / "images" / "pig.png"),
-    CODE_UNCOVERED_MINE_OK:  QtGui.QImage(BASE_PATH / "images" / "pig_ok.png"),
-    CODE_UNCOVERED_MINE_BAD: QtGui.QImage(BASE_PATH / "images" / "pig_bad.png"),
+    CELL_COVERED:            QtGui.QImage(BASE_PATH / "images" / "cell_white.png"),
+    CELL_UNCOVERED:          QtGui.QImage(),
+    CELL_COVERED_FLAG:       QtGui.QImage(BASE_PATH / "images" / "cell_flag_white.png"),
+    CELL_UNCOVERED_MINE:     QtGui.QImage(BASE_PATH / "images" / "pig.png"),
+    CELL_UNCOVERED_MINE_OK:  QtGui.QImage(BASE_PATH / "images" / "pig_ok.png"),
+    CELL_UNCOVERED_MINE_BAD: QtGui.QImage(BASE_PATH / "images" / "pig_bad.png"),
 })
 
-GAME_NONE = 0
-GAME_BLOCK = 1
+GAME_BLOCK = 0
+GAME_RUNNING = 1
 GAME_VICTORY = 2
 GAME_DEFEAT = 3
 
 # idk why, but pixmap crushes program execution (Process finished with exit code -1073741819 (0xC0000005))
 # TEST_PIXMAP = QtGui.QPixmap()
 # TEST_PIXMAP.load("BigFruit.png")
-# TEST_PIXMAP.fromImage(PICT_DICT[CODE_COVERED])
+# TEST_PIXMAP.fromImage(PICT_DICT[CELL_COVERED])
 
 
 class ItemDelegate(QtWidgets.QStyledItemDelegate):
@@ -196,7 +196,7 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
         if self._game_state == GAME_BLOCK:
             return
         # ask only after game started
-        if not self._uncovered_cells or self._game_state != GAME_NONE or QtWidgets.QMessageBox.question(
+        if not self._uncovered_cells or self._game_state != GAME_RUNNING or QtWidgets.QMessageBox.question(
             self, "Confirm", "Are you sure you want to start a new game?",
             QtWidgets.QMessageBox.StandardButton.Yes, QtWidgets.QMessageBox.StandardButton.No
         ) == QtWidgets.QMessageBox.StandardButton.Yes:
@@ -234,7 +234,7 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
         self._num_rows = rows
         self._num_cols = cols
         self._num_mines = mines
-        self._game_state = GAME_NONE
+        self._game_state = GAME_RUNNING
         self._uncovered_cells = 0
         self._flagged_cells = 0
         self.timer.stop()
@@ -258,7 +258,7 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
         for i in range(rows):
             for j in range(cols):
                 item = QtWidgets.QTableWidgetItem()
-                item.setText(CODE_COVERED)
+                item.setText(CELL_COVERED)
                 table_widget.setItem(i, j, item)
 
                 label = CustomLabel(item)
@@ -271,7 +271,7 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
         table_widget = self.tableWidget
         this_label = table_widget.cellWidget(row, col)
         this_item = this_label.item
-        if this_item.text() != CODE_COVERED:  # only covered cell can become uncovered
+        if this_item.text() != CELL_COVERED:  # only covered cell can become uncovered
             return
 
         # Call function for 3x3 area
@@ -290,7 +290,7 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
                     if label.mined:
                         mines_in_area += 1
 
-        this_item.setText(CODE_UNCOVERED)
+        this_item.setText(CELL_UNCOVERED)
         self._uncovered_cells += 1
         self._emit_uncovered_cells()
         if mines_in_area:
@@ -301,7 +301,7 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
 
     def cell_uncover(self, row, col):
         """Uncover covered cell."""
-        if self._game_state != GAME_NONE:
+        if self._game_state != GAME_RUNNING:
             return
 
         if not self._uncovered_cells:  # start timer only after first uncover
@@ -310,7 +310,7 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
         item = self.tableWidget.item(row, col)
         label = self.tableWidget.cellWidget(row, col)
         item_text = item.text()
-        if item_text != CODE_COVERED:  # ignore if not default covered cell
+        if item_text != CELL_COVERED:  # ignore if not default covered cell
             return
         if label.mined:
             self._end_game(row, col, defeat=True)
@@ -321,16 +321,16 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
 
     def cell_toggle_flag(self, row, col):
         """Toggle flag on covered cell."""
-        if self._game_state != GAME_NONE:
+        if self._game_state != GAME_RUNNING:
             return
 
         item = self.tableWidget.item(row, col)
         item_text = item.text()
-        if item_text == CODE_COVERED:
-            item.setText(CODE_COVERED_FLAG)
+        if item_text == CELL_COVERED:
+            item.setText(CELL_COVERED_FLAG)
             self._flagged_cells += 1
-        elif item_text == CODE_COVERED_FLAG:
-            item.setText(CODE_COVERED)
+        elif item_text == CELL_COVERED_FLAG:
+            item.setText(CELL_COVERED)
             self._flagged_cells -= 1
         else:
             return
@@ -373,9 +373,9 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
             return None
 
         if item := get_item(row, col):
-            item.setText(CODE_UNCOVERED_MINE)
+            item.setText(CELL_UNCOVERED_MINE)
             self._animation_sleep()
-            item.setText(CODE_UNCOVERED_MINE_BAD)
+            item.setText(CELL_UNCOVERED_MINE_BAD)
         if self._num_mines == mines_exploded:  # return if it was the only one
             return
         self._animation_sleep()
@@ -400,10 +400,10 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
 
             if square_items:
                 for item in square_items:
-                    item.setText(CODE_UNCOVERED_MINE)
+                    item.setText(CELL_UNCOVERED_MINE)
                 self._animation_sleep()
                 for item in square_items:
-                    item.setText(CODE_UNCOVERED_MINE_BAD)
+                    item.setText(CELL_UNCOVERED_MINE_BAD)
 
             if mines_exploded == self._num_mines:
                 break
@@ -425,7 +425,7 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
                 label = table_widget.cellWidget(i, j)
                 if label.mined:
                     is_row_mined = True
-                    label.item.setText(CODE_UNCOVERED_MINE_OK)
+                    label.item.setText(CELL_UNCOVERED_MINE_OK)
                     mines_defused += 1
             if mines_defused == self._num_mines or i == rows - 1:
                 break
