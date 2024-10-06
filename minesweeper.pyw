@@ -190,7 +190,7 @@ class MinesweeperConfig:
     @animation_period.setter
     def animation_period(self, value: int):
         """Set animation_period setting."""
-        if not (MIN_ROWS <= value <= MAX_ROWS):
+        if not (MIN_ANIMATION_PERIOD <= value <= MAX_ANIMATION_PERIOD):
             msg = (f"Error while setting value: animation period must be between "
                    f"{MIN_ANIMATION_PERIOD} and {MAX_ANIMATION_PERIOD}")
             raise ValueError(msg)
