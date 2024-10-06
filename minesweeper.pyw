@@ -216,6 +216,8 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
         self.settings_cols = self.settings_dialog.spinBox_cols.value()
         self.settings_mines = self.settings_dialog.spinBox_mines.value()
         self.settings_animation_period = self.settings_dialog.spinBox_animationPeriod.value()
+        if not self._uncovered_cells or self._game_state != GAME_RUNNING:
+            self._set_field()
 
     def _animation_sleep(self):
         QtTest.QTest.qWait(self.settings_animation_period)  # QTimer should be used, but this is much easier
