@@ -16,29 +16,49 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QAbstractButton, QApplication, QDialog, QDialogButtonBox,
-    QLabel, QSizePolicy, QVBoxLayout, QWidget)
+    QFrame, QLabel, QLineEdit, QSizePolicy,
+    QSpacerItem, QVBoxLayout, QWidget)
 
 class Ui_MinesweeperAbout(object):
     def setupUi(self, MinesweeperAbout):
         if not MinesweeperAbout.objectName():
             MinesweeperAbout.setObjectName(u"MinesweeperAbout")
-        MinesweeperAbout.resize(318, 400)
+        MinesweeperAbout.resize(318, 435)
+        MinesweeperAbout.setContextMenuPolicy(Qt.ContextMenuPolicy.ActionsContextMenu)
+        MinesweeperAbout.setAcceptDrops(True)
         self.verticalLayout = QVBoxLayout(MinesweeperAbout)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.label = QLabel(MinesweeperAbout)
         self.label.setObjectName(u"label")
+        font = QFont()
+        font.setBold(True)
+        self.label.setFont(font)
+        self.label.setFrameShape(QFrame.Shape.StyledPanel)
+        self.label.setFrameShadow(QFrame.Shadow.Raised)
 
         self.verticalLayout.addWidget(self.label)
 
+        self.lineEdit = QLineEdit(MinesweeperAbout)
+        self.lineEdit.setObjectName(u"lineEdit")
+        self.lineEdit.setFrame(False)
+        self.lineEdit.setDragEnabled(True)
+        self.lineEdit.setReadOnly(True)
+
+        self.verticalLayout.addWidget(self.lineEdit)
+
         self.label_2 = QLabel(MinesweeperAbout)
         self.label_2.setObjectName(u"label_2")
-        font = QFont()
-        font.setFamilies([u"Courier"])
-        font.setPointSize(4)
-        font.setBold(True)
-        self.label_2.setFont(font)
+        font1 = QFont()
+        font1.setFamilies([u"Courier"])
+        font1.setPointSize(4)
+        font1.setBold(True)
+        self.label_2.setFont(font1)
 
         self.verticalLayout.addWidget(self.label_2)
+
+        self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+
+        self.verticalLayout.addItem(self.verticalSpacer)
 
         self.buttonBox = QDialogButtonBox(MinesweeperAbout)
         self.buttonBox.setObjectName(u"buttonBox")
@@ -57,7 +77,8 @@ class Ui_MinesweeperAbout(object):
 
     def retranslateUi(self, MinesweeperAbout):
         MinesweeperAbout.setWindowTitle(QCoreApplication.translate("MinesweeperAbout", u"Dialog", None))
-        self.label.setText(QCoreApplication.translate("MinesweeperAbout", u"https://github.com/monkecoder/Minesweeper.git", None))
+        self.label.setText(QCoreApplication.translate("MinesweeperAbout", u"Minesweeper game based on PySide6", None))
+        self.lineEdit.setText(QCoreApplication.translate("MinesweeperAbout", u"https://github.com/monkecoder/Minesweeper.git", None))
         self.label_2.setText(QCoreApplication.translate("MinesweeperAbout", u"....................................................................................................\n"
 "....................................................................................................\n"
 "..............................................................................x&&&&&&x..............\n"
