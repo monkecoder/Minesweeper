@@ -57,7 +57,7 @@ class MinesweeperConfig:
     """Class for saving/loading minesweeper settings configuration."""
 
     def __init__(self):
-        """Constructor."""
+        """Initialize."""
         self._config = ConfigParser()
         self._last_path = None
 
@@ -72,14 +72,17 @@ class MinesweeperConfig:
         return self._last_path
 
     def _create_section_if_not_exist(self, section):
+        """Create _config section if it doesn't exist."""
         if not self._config.has_section(section):
             self._config.add_section(section)
 
     def _remove_section_if_empty(self, section):
+        """Remove _config section if it's empty."""
         if self._config.has_section(section) and not self._config.options(section):
             self._config.remove_section(section)
 
     def _fix_mines_value(self):
+        """Fix mines value if it's too big (maximum value of mines = rows * cols - 1)."""
         max_mines = self.rows * self.cols - 1
         if self.mines > max_mines:
             self.mines = max_mines
@@ -295,8 +298,10 @@ class MinesweeperSettings(QtWidgets.QDialog, Ui_MinesweeperSettings):
 
 
 class MinesweeperAbout(QtWidgets.QDialog, Ui_MinesweeperAbout):
+    """Minesweeper about program dialog."""
+
     def __init__(self, parent):
-        """Initialize minesweeper settings dialog."""
+        """Initialize minesweeper about program dialog."""
         QtWidgets.QDialog.__init__(self, parent, QtCore.Qt.WindowType.Dialog)
         self.setupUi(self)
         self.setWindowTitle("About program")
