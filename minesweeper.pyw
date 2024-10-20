@@ -7,9 +7,9 @@ from types import MappingProxyType
 import numpy as np
 from PySide6 import QtCore, QtGui, QtWidgets, QtTest
 
+from gui.minesweeper_about_ui import Ui_MinesweeperAbout
 from gui.minesweeper_settings_ui import Ui_MinesweeperSettings
 from gui.minesweeper_window_ui import Ui_MinesweeperWindow
-from gui.minesweeper_about_ui import Ui_MinesweeperAbout
 
 BASE_PATH = Path(__file__).parent
 
