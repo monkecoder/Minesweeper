@@ -274,6 +274,8 @@ class MinesweeperSettings(QtWidgets.QDialog, Ui_MinesweeperSettings):
         """Initialize minesweeper settings dialog."""
         QtWidgets.QDialog.__init__(self, parent, QtCore.Qt.WindowType.Dialog)
         self.setupUi(self)
+        self.setWindowTitle("Settings")
+
         self.spinBox_rows.setMinimum(MIN_ROWS)
         self.spinBox_rows.setMaximum(MAX_ROWS)
         self.spinBox_cols.setMinimum(MIN_COLS)
@@ -297,6 +299,7 @@ class MinesweeperAbout(QtWidgets.QDialog, Ui_MinesweeperAbout):
         """Initialize minesweeper settings dialog."""
         QtWidgets.QDialog.__init__(self, parent, QtCore.Qt.WindowType.Dialog)
         self.setupUi(self)
+        self.setWindowTitle("About program")
 
 
 class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
@@ -351,7 +354,7 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
         # Init shortcuts
         self.action_restartGame.setShortcut(QtGui.QKeySequence("Alt+R"))
         self.action_settings.setShortcut(QtGui.QKeySequence("Alt+S"))
-        self.action_aboutProgram.setShortcut(QtGui.QKeySequence("Alt+H"))
+        self.action_aboutProgram.setShortcut(QtGui.QKeySequence("Alt+A"))
 
         # Init minesweeper logic
         self._num_rows = 0
