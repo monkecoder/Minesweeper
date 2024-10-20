@@ -9,6 +9,7 @@ from PySide6 import QtCore, QtGui, QtWidgets, QtTest
 
 from gui.minesweeper_settings_ui import Ui_MinesweeperSettings
 from gui.minesweeper_window_ui import Ui_MinesweeperWindow
+from gui.minesweeper_about_ui import Ui_MinesweeperAbout
 
 BASE_PATH = Path(__file__).parent
 
@@ -291,6 +292,13 @@ class MinesweeperSettings(QtWidgets.QDialog, Ui_MinesweeperSettings):
         self.spinBox_mines.setMaximum(mines_max)
 
 
+class MinesweeperAbout(QtWidgets.QDialog, Ui_MinesweeperAbout):
+    def __init__(self, parent):
+        """Initialize minesweeper settings dialog."""
+        QtWidgets.QDialog.__init__(self, parent, QtCore.Qt.WindowType.Dialog)
+        self.setupUi(self)
+
+
 class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
     """Minesweeper main window."""
 
@@ -300,6 +308,8 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
         self.settings_dialog = MinesweeperSettings(self)
         self.settings_dialog.setWindowModality(QtCore.Qt.WindowModality.ApplicationModal)
         self.settings_dialog.buttonBox.accepted.connect(self._update_settings)
+        self.about_dialog = MinesweeperAbout(self)
+        self.about_dialog.setWindowModality(QtCore.Qt.WindowModality.ApplicationModal)
 
         self.setupUi(self)
         self.setWindowTitle("Minesweeper")
@@ -328,6 +338,7 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
 
         self.action_restartGame.triggered.connect(self.restart_game)
         self.action_settings.triggered.connect(self.show_settings_dialog)
+        self.action_aboutProgram.triggered.connect(self.about_dialog.show)
 
         for widget in (self.lcdNumber_cellsUncovered, self.label_1, self.lcdNumber_cellsNotMined):
             widget.setToolTip("Uncovered cells / Not mined cells")
