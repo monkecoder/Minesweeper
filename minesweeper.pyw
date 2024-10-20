@@ -305,6 +305,7 @@ class MinesweeperAbout(QtWidgets.QDialog, Ui_MinesweeperAbout):
         QtWidgets.QDialog.__init__(self, parent, QtCore.Qt.WindowType.Dialog)
         self.setupUi(self)
         self.setWindowTitle("About program")
+        self.label_2.linkActivated.connect(QtGui.QDesktopServices.openUrl)
 
 
 class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):

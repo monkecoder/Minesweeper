@@ -16,8 +16,8 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QAbstractButton, QApplication, QDialog, QDialogButtonBox,
-    QFrame, QLabel, QLineEdit, QSizePolicy,
-    QSpacerItem, QVBoxLayout, QWidget)
+    QFrame, QLabel, QSizePolicy, QSpacerItem,
+    QVBoxLayout, QWidget)
 
 class Ui_MinesweeperAbout(object):
     def setupUi(self, MinesweeperAbout):
@@ -38,23 +38,20 @@ class Ui_MinesweeperAbout(object):
 
         self.verticalLayout.addWidget(self.label)
 
-        self.lineEdit = QLineEdit(MinesweeperAbout)
-        self.lineEdit.setObjectName(u"lineEdit")
-        self.lineEdit.setFrame(False)
-        self.lineEdit.setDragEnabled(True)
-        self.lineEdit.setReadOnly(True)
-
-        self.verticalLayout.addWidget(self.lineEdit)
-
         self.label_2 = QLabel(MinesweeperAbout)
         self.label_2.setObjectName(u"label_2")
+
+        self.verticalLayout.addWidget(self.label_2)
+
+        self.label_3 = QLabel(MinesweeperAbout)
+        self.label_3.setObjectName(u"label_3")
         font1 = QFont()
         font1.setFamilies([u"Courier"])
         font1.setPointSize(4)
         font1.setBold(True)
-        self.label_2.setFont(font1)
+        self.label_3.setFont(font1)
 
-        self.verticalLayout.addWidget(self.label_2)
+        self.verticalLayout.addWidget(self.label_3)
 
         self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
@@ -78,8 +75,8 @@ class Ui_MinesweeperAbout(object):
     def retranslateUi(self, MinesweeperAbout):
         MinesweeperAbout.setWindowTitle(QCoreApplication.translate("MinesweeperAbout", u"Dialog", None))
         self.label.setText(QCoreApplication.translate("MinesweeperAbout", u"Minesweeper game based on PySide6", None))
-        self.lineEdit.setText(QCoreApplication.translate("MinesweeperAbout", u"https://github.com/monkecoder/Minesweeper.git", None))
-        self.label_2.setText(QCoreApplication.translate("MinesweeperAbout", u"....................................................................................................\n"
+        self.label_2.setText(QCoreApplication.translate("MinesweeperAbout", u"<a href='https://github.com/monkecoder/Minesweeper.git'>Minesweeper on GitHub</a>", None))
+        self.label_3.setText(QCoreApplication.translate("MinesweeperAbout", u"....................................................................................................\n"
 "....................................................................................................\n"
 "..............................................................................x&&&&&&x..............\n"
 "...........................................................................;&&&&&&&&&&X.............\n"
