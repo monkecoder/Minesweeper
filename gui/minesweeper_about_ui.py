@@ -16,29 +16,37 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QAbstractButton, QApplication, QDialog, QDialogButtonBox,
-    QLabel, QSizePolicy, QWidget)
+    QLabel, QSizePolicy, QVBoxLayout, QWidget)
 
 class Ui_MinesweeperAbout(object):
     def setupUi(self, MinesweeperAbout):
         if not MinesweeperAbout.objectName():
             MinesweeperAbout.setObjectName(u"MinesweeperAbout")
-        MinesweeperAbout.resize(362, 427)
-        self.buttonBox = QDialogButtonBox(MinesweeperAbout)
-        self.buttonBox.setObjectName(u"buttonBox")
-        self.buttonBox.setGeometry(QRect(30, 390, 301, 32))
-        self.buttonBox.setOrientation(Qt.Orientation.Horizontal)
-        self.buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Ok)
+        MinesweeperAbout.resize(318, 400)
+        self.verticalLayout = QVBoxLayout(MinesweeperAbout)
+        self.verticalLayout.setObjectName(u"verticalLayout")
         self.label = QLabel(MinesweeperAbout)
         self.label.setObjectName(u"label")
-        self.label.setGeometry(QRect(30, 20, 341, 16))
+
+        self.verticalLayout.addWidget(self.label)
+
         self.label_2 = QLabel(MinesweeperAbout)
         self.label_2.setObjectName(u"label_2")
-        self.label_2.setGeometry(QRect(30, 50, 301, 331))
         font = QFont()
         font.setFamilies([u"Courier"])
         font.setPointSize(4)
         font.setBold(True)
         self.label_2.setFont(font)
+
+        self.verticalLayout.addWidget(self.label_2)
+
+        self.buttonBox = QDialogButtonBox(MinesweeperAbout)
+        self.buttonBox.setObjectName(u"buttonBox")
+        self.buttonBox.setOrientation(Qt.Orientation.Horizontal)
+        self.buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Ok)
+
+        self.verticalLayout.addWidget(self.buttonBox)
+
 
         self.retranslateUi(MinesweeperAbout)
         self.buttonBox.accepted.connect(MinesweeperAbout.accept)
