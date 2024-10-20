@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'mineswepeer_window.ui'
+## Form generated from reading UI file 'minesweeper_window.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.7.2
 ##
@@ -27,8 +27,8 @@ class Ui_MinesweeperWindow(object):
         if not MinesweeperWindow.objectName():
             MinesweeperWindow.setObjectName(u"MinesweeperWindow")
         MinesweeperWindow.resize(800, 600)
-        self.action_startNewGame = QAction(MinesweeperWindow)
-        self.action_startNewGame.setObjectName(u"action_startNewGame")
+        self.action_restartGame = QAction(MinesweeperWindow)
+        self.action_restartGame.setObjectName(u"action_restartGame")
         self.action_settings = QAction(MinesweeperWindow)
         self.action_settings.setObjectName(u"action_settings")
         self.action_aboutProgram = QAction(MinesweeperWindow)
@@ -52,9 +52,9 @@ class Ui_MinesweeperWindow(object):
 
         self.lcdNumber_cellsUncovered = QLCDNumber(self.centralwidget)
         self.lcdNumber_cellsUncovered.setObjectName(u"lcdNumber_cellsUncovered")
-        self.lcdNumber_cellsUncovered.setFrameShadow(QFrame.Plain)
+        self.lcdNumber_cellsUncovered.setFrameShadow(QFrame.Shadow.Plain)
         self.lcdNumber_cellsUncovered.setDigitCount(3)
-        self.lcdNumber_cellsUncovered.setSegmentStyle(QLCDNumber.Flat)
+        self.lcdNumber_cellsUncovered.setSegmentStyle(QLCDNumber.SegmentStyle.Flat)
 
         self.horizontalLayout.addWidget(self.lcdNumber_cellsUncovered)
 
@@ -65,9 +65,9 @@ class Ui_MinesweeperWindow(object):
 
         self.lcdNumber_cellsNotMined = QLCDNumber(self.centralwidget)
         self.lcdNumber_cellsNotMined.setObjectName(u"lcdNumber_cellsNotMined")
-        self.lcdNumber_cellsNotMined.setFrameShadow(QFrame.Plain)
+        self.lcdNumber_cellsNotMined.setFrameShadow(QFrame.Shadow.Plain)
         self.lcdNumber_cellsNotMined.setDigitCount(3)
-        self.lcdNumber_cellsNotMined.setSegmentStyle(QLCDNumber.Flat)
+        self.lcdNumber_cellsNotMined.setSegmentStyle(QLCDNumber.SegmentStyle.Flat)
 
         self.horizontalLayout.addWidget(self.lcdNumber_cellsNotMined)
 
@@ -78,9 +78,9 @@ class Ui_MinesweeperWindow(object):
 
         self.lcdNumber_cellsFlagged = QLCDNumber(self.centralwidget)
         self.lcdNumber_cellsFlagged.setObjectName(u"lcdNumber_cellsFlagged")
-        self.lcdNumber_cellsFlagged.setFrameShadow(QFrame.Plain)
+        self.lcdNumber_cellsFlagged.setFrameShadow(QFrame.Shadow.Plain)
         self.lcdNumber_cellsFlagged.setDigitCount(3)
-        self.lcdNumber_cellsFlagged.setSegmentStyle(QLCDNumber.Flat)
+        self.lcdNumber_cellsFlagged.setSegmentStyle(QLCDNumber.SegmentStyle.Flat)
 
         self.horizontalLayout.addWidget(self.lcdNumber_cellsFlagged)
 
@@ -91,9 +91,9 @@ class Ui_MinesweeperWindow(object):
 
         self.lcdNumber_cellsMined = QLCDNumber(self.centralwidget)
         self.lcdNumber_cellsMined.setObjectName(u"lcdNumber_cellsMined")
-        self.lcdNumber_cellsMined.setFrameShadow(QFrame.Plain)
+        self.lcdNumber_cellsMined.setFrameShadow(QFrame.Shadow.Plain)
         self.lcdNumber_cellsMined.setDigitCount(3)
-        self.lcdNumber_cellsMined.setSegmentStyle(QLCDNumber.Flat)
+        self.lcdNumber_cellsMined.setSegmentStyle(QLCDNumber.SegmentStyle.Flat)
 
         self.horizontalLayout.addWidget(self.lcdNumber_cellsMined)
 
@@ -108,17 +108,17 @@ class Ui_MinesweeperWindow(object):
 
         self.frame_timer = QFrame(self.centralwidget)
         self.frame_timer.setObjectName(u"frame_timer")
-        self.frame_timer.setFrameShape(QFrame.Box)
-        self.frame_timer.setFrameShadow(QFrame.Plain)
+        self.frame_timer.setFrameShape(QFrame.Shape.Box)
+        self.frame_timer.setFrameShadow(QFrame.Shadow.Plain)
         self.verticalLayout_2 = QVBoxLayout(self.frame_timer)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.verticalLayout_2.setContentsMargins(1, 1, 1, 1)
         self.timeEdit_timer = QTimeEdit(self.frame_timer)
         self.timeEdit_timer.setObjectName(u"timeEdit_timer")
-        self.timeEdit_timer.setFocusPolicy(Qt.NoFocus)
+        self.timeEdit_timer.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.timeEdit_timer.setFrame(False)
         self.timeEdit_timer.setReadOnly(True)
-        self.timeEdit_timer.setButtonSymbols(QAbstractSpinBox.NoButtons)
+        self.timeEdit_timer.setButtonSymbols(QAbstractSpinBox.ButtonSymbols.NoButtons)
 
         self.verticalLayout_2.addWidget(self.timeEdit_timer)
 
@@ -140,7 +140,7 @@ class Ui_MinesweeperWindow(object):
 
         self.menubar.addAction(self.menu_settings.menuAction())
         self.menubar.addAction(self.menu_help.menuAction())
-        self.menu_settings.addAction(self.action_startNewGame)
+        self.menu_settings.addAction(self.action_restartGame)
         self.menu_settings.addSeparator()
         self.menu_settings.addAction(self.action_settings)
         self.menu_help.addAction(self.action_aboutProgram)
@@ -152,7 +152,7 @@ class Ui_MinesweeperWindow(object):
 
     def retranslateUi(self, MinesweeperWindow):
         MinesweeperWindow.setWindowTitle(QCoreApplication.translate("MinesweeperWindow", u"MainWindow", None))
-        self.action_startNewGame.setText(QCoreApplication.translate("MinesweeperWindow", u"Start new game", None))
+        self.action_restartGame.setText(QCoreApplication.translate("MinesweeperWindow", u"Restart game", None))
         self.action_settings.setText(QCoreApplication.translate("MinesweeperWindow", u"Settings", None))
         self.action_aboutProgram.setText(QCoreApplication.translate("MinesweeperWindow", u"About program", None))
         self.label_cellsUncovered.setText(QCoreApplication.translate("MinesweeperWindow", u"Uncovered cells:", None))

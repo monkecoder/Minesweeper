@@ -326,7 +326,7 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
         self.timer = QtCore.QTimer(self)
         self.timer.timeout.connect(self._timer_job)
 
-        self.action_startNewGame.triggered.connect(self.start_new_game)
+        self.action_restartGame.triggered.connect(self.restart_game)
         self.action_settings.triggered.connect(self.show_settings_dialog)
 
         for widget in (self.lcdNumber_cellsUncovered, self.label_1, self.lcdNumber_cellsNotMined):
@@ -338,7 +338,7 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
         self.timeEdit_timer.lineEdit().installEventFilter(self)
 
         # Init shortcuts
-        self.action_startNewGame.setShortcut(QtGui.QKeySequence("Alt+N"))
+        self.action_restartGame.setShortcut(QtGui.QKeySequence("Alt+R"))
         self.action_settings.setShortcut(QtGui.QKeySequence("Alt+S"))
         self.action_aboutProgram.setShortcut(QtGui.QKeySequence("Alt+H"))
 
@@ -358,13 +358,13 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
         time_obj = self.timeEdit_timer.time().addMSecs(self.timer.interval())
         self.timeEdit_timer.setTime(time_obj)
 
-    def start_new_game(self):
+    def restart_game(self):
         """Start a new game."""
         if self._game_state == GAME_BLOCK:
             return
         # ask only after game started
         if not self._uncovered_cells or self._game_state != GAME_RUNNING or QtWidgets.QMessageBox.question(
-            self, "Confirm", "Are you sure you want to start a new game?",
+            self, "Confirm", "Are you sure you want to restart the game?",
             QtWidgets.QMessageBox.StandardButton.Yes, QtWidgets.QMessageBox.StandardButton.No
         ) == QtWidgets.QMessageBox.StandardButton.Yes:
             self._set_field()

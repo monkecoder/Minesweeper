@@ -34,13 +34,13 @@
       <item>
        <widget class="QLCDNumber" name="lcdNumber_cellsUncovered">
         <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
+         <enum>QFrame::Shadow::Plain</enum>
         </property>
         <property name="digitCount">
          <number>3</number>
         </property>
         <property name="segmentStyle">
-         <enum>QLCDNumber::Flat</enum>
+         <enum>QLCDNumber::SegmentStyle::Flat</enum>
         </property>
        </widget>
       </item>
@@ -54,13 +54,13 @@
       <item>
        <widget class="QLCDNumber" name="lcdNumber_cellsNotMined">
         <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
+         <enum>QFrame::Shadow::Plain</enum>
         </property>
         <property name="digitCount">
          <number>3</number>
         </property>
         <property name="segmentStyle">
-         <enum>QLCDNumber::Flat</enum>
+         <enum>QLCDNumber::SegmentStyle::Flat</enum>
         </property>
        </widget>
       </item>
@@ -74,13 +74,13 @@
       <item>
        <widget class="QLCDNumber" name="lcdNumber_cellsFlagged">
         <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
+         <enum>QFrame::Shadow::Plain</enum>
         </property>
         <property name="digitCount">
          <number>3</number>
         </property>
         <property name="segmentStyle">
-         <enum>QLCDNumber::Flat</enum>
+         <enum>QLCDNumber::SegmentStyle::Flat</enum>
         </property>
        </widget>
       </item>
@@ -94,20 +94,20 @@
       <item>
        <widget class="QLCDNumber" name="lcdNumber_cellsMined">
         <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
+         <enum>QFrame::Shadow::Plain</enum>
         </property>
         <property name="digitCount">
          <number>3</number>
         </property>
         <property name="segmentStyle">
-         <enum>QLCDNumber::Flat</enum>
+         <enum>QLCDNumber::SegmentStyle::Flat</enum>
         </property>
        </widget>
       </item>
       <item>
        <spacer name="horizontalSpacer">
         <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+         <enum>Qt::Orientation::Horizontal</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
@@ -127,10 +127,10 @@
       <item>
        <widget class="QFrame" name="frame_timer">
         <property name="frameShape">
-         <enum>QFrame::Box</enum>
+         <enum>QFrame::Shape::Box</enum>
         </property>
         <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
+         <enum>QFrame::Shadow::Plain</enum>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_2">
          <property name="leftMargin">
@@ -148,7 +148,7 @@
          <item>
           <widget class="QTimeEdit" name="timeEdit_timer">
            <property name="focusPolicy">
-            <enum>Qt::NoFocus</enum>
+            <enum>Qt::FocusPolicy::NoFocus</enum>
            </property>
            <property name="frame">
             <bool>false</bool>
@@ -157,7 +157,7 @@
             <bool>true</bool>
            </property>
            <property name="buttonSymbols">
-            <enum>QAbstractSpinBox::NoButtons</enum>
+            <enum>QAbstractSpinBox::ButtonSymbols::NoButtons</enum>
            </property>
            <property name="displayFormat">
             <string>mm:ss</string>
@@ -184,7 +184,7 @@
     <property name="title">
      <string>Game</string>
     </property>
-    <addaction name="action_startNewGame"/>
+    <addaction name="action_restartGame"/>
     <addaction name="separator"/>
     <addaction name="action_settings"/>
    </widget>
@@ -197,9 +197,9 @@
    <addaction name="menu_settings"/>
    <addaction name="menu_help"/>
   </widget>
-  <action name="action_startNewGame">
+  <action name="action_restartGame">
    <property name="text">
-    <string>Start new game</string>
+    <string>Restart game</string>
    </property>
   </action>
   <action name="action_settings">
