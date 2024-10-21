@@ -71,7 +71,7 @@ class MinesweeperConfig:
         """Get last path of the config file."""
         return self._last_path
 
-    def _create_section_if_not_exist(self, section):
+    def _add_section_if_not_exist(self, section):
         """Create _config section if it doesn't exist."""
         if not self._config.has_section(section):
             self._config.add_section(section)
@@ -131,7 +131,7 @@ class MinesweeperConfig:
         if not (MIN_ROWS <= value <= MAX_ROWS):
             msg = f"Error while setting value: rows must be between {MIN_ROWS} and {MAX_ROWS}"
             raise ValueError(msg)
-        self._create_section_if_not_exist("ALL")
+        self._add_section_if_not_exist("ALL")
         self._config.set("ALL", "rows", str(value))
         self._fix_mines_value()
 
@@ -153,7 +153,7 @@ class MinesweeperConfig:
         if not (MIN_ROWS <= value <= MAX_ROWS):
             msg = f"Error while setting value: cols must be between {MIN_COLS} and {MAX_COLS}"
             raise ValueError(msg)
-        self._create_section_if_not_exist("ALL")
+        self._add_section_if_not_exist("ALL")
         self._config.set("ALL", "cols", str(value))
         self._fix_mines_value()
 
@@ -177,7 +177,7 @@ class MinesweeperConfig:
         if not (min_mines <= value <= max_mines):
             msg = f"Error while setting value: mines must be between {min_mines} and {max_mines}"
             raise ValueError(msg)
-        self._create_section_if_not_exist("ALL")
+        self._add_section_if_not_exist("ALL")
         self._config.set("ALL", "mines", str(value))
 
     @mines.deleter
@@ -198,7 +198,7 @@ class MinesweeperConfig:
             msg = (f"Error while setting value: animation period must be between "
                    f"{MIN_ANIMATION_PERIOD} and {MAX_ANIMATION_PERIOD}")
             raise ValueError(msg)
-        self._create_section_if_not_exist("ALL")
+        self._add_section_if_not_exist("ALL")
         self._config.set("ALL", "animation_period", str(value))
 
     @animation_period.deleter
