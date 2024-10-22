@@ -684,7 +684,12 @@ def main(sys_argv):
     """Start minesweeper application."""
     app = QtWidgets.QApplication(sys_argv)
     # app.setStyle(QtWidgets.QStyleFactory.create("Fusion"))
-    window = MinesweeperWindow()
+    try:
+        window = MinesweeperWindow()
+    except ValueError as e:
+        window = QtWidgets.QMainWindow()
+        QtWidgets.QMessageBox.critical(window, "Minesweeper error", str(e), QtWidgets.QMessageBox.StandardButton.Ok)
+        return -1
     window.show()
     return app.exec()
 
