@@ -399,16 +399,21 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
 
     def _update_settings(self):
         """Update settings if settings dialog was accepted."""
-        self.settings_rows = self.settings_dialog.spinBox_rows.value()
-        self.settings_cols = self.settings_dialog.spinBox_cols.value()
-        self.settings_mines = self.settings_dialog.spinBox_mines.value()
-        self.settings_animation_period = self.settings_dialog.spinBox_animationPeriod.value()
-        self._config.rows = self.settings_rows
-        self._config.cols = self.settings_cols
-        self._config.mines = self.settings_mines
-        self._config.animation_period = self.settings_animation_period
-        if not self._uncovered_cells or self._game_state != GAME_RUNNING:
-            self._set_field()
+        rows, cols, mines, animation_period = (
+            self.settings_dialog.spinBox_rows.value(),
+            self.settings_dialog.spinBox_cols.value(),
+            self.settings_dialog.spinBox_mines.value(),
+            self.settings_dialog.spinBox_animationPeriod.value(),
+        )
+
+        self.settings_animation_period = animation_period
+
+        # Check if field settings changed
+        if (self.settings_rows, self.settings_cols, self.settings_mines) != (rows, cols, mines):
+            self.settings_rows, self.settings_cols, self.settings_mines = rows, cols, mines
+            # Auto game restart
+            if not self._uncovered_cells or self._game_state != GAME_RUNNING:
+                self._set_field()
 
     def _animation_sleep(self):
         QtTest.QTest.qWait(self.settings_animation_period)  # QTimer should be used, but this is much easier
@@ -650,6 +655,8 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
                 self, "Confirm", "Are you sure you want to exit the program?",
                 QtWidgets.QMessageBox.StandardButton.Yes, QtWidgets.QMessageBox.StandardButton.No
         ) == QtWidgets.QMessageBox.StandardButton.Yes:
+            self._config.rows, self._config.cols, self._config.mines, self._config.animation_period = \
+                self.settings_rows, self.settings_cols, self.settings_mines, self.settings_animation_period
             self._config.save_config()
             event.accept()
         else:
