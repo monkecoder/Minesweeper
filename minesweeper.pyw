@@ -31,8 +31,7 @@ PICT_DICT = MappingProxyType({
 
 GAME_BLOCK = 0
 GAME_RUNNING = 1
-GAME_VICTORY = 2
-GAME_DEFEAT = 3
+GAME_END = 2
 
 # idk why, but pixmap crushes program execution (Process finished with exit code -1073741819 (0xC0000005))
 # TEST_PIXMAP = QtGui.QPixmap()
@@ -316,7 +315,7 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
         QtWidgets.QMainWindow.__init__(self, parent, flags)
         self.settings_dialog = MinesweeperSettings(self)
         self.settings_dialog.setWindowModality(QtCore.Qt.WindowModality.ApplicationModal)
-        self.settings_dialog.buttonBox.accepted.connect(self._update_settings)
+        self.settings_dialog.buttonBox.accepted.connect(self.update_settings)
         self.about_dialog = MinesweeperAbout(self)
         self.about_dialog.setWindowModality(QtCore.Qt.WindowModality.ApplicationModal)
 
@@ -367,11 +366,11 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
         self._num_cols = 0
         self._num_mines = 0
         self._mines_preset = None
-        self._game_state = GAME_BLOCK
         self._uncovered_cells = 0
         self._flagged_cells = 0
 
         self._set_field()
+        self._game_state = GAME_RUNNING
 
     def _timer_job(self):
         """Update data for timeEdit_timer widget (executed by timer)."""
@@ -382,12 +381,19 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
         """Start a new game."""
         if self._game_state == GAME_BLOCK:
             return
+        prev_game_state = self._game_state
+        self._game_state = GAME_BLOCK
+
         # ask only after game started
-        if not self._uncovered_cells or self._game_state != GAME_RUNNING or QtWidgets.QMessageBox.question(
-            self, "Confirm", "Are you sure you want to restart the game?",
-            QtWidgets.QMessageBox.StandardButton.Yes, QtWidgets.QMessageBox.StandardButton.No
-        ) == QtWidgets.QMessageBox.StandardButton.Yes:
+        if (not self._uncovered_cells and prev_game_state == GAME_RUNNING) or prev_game_state == GAME_END or \
+                QtWidgets.QMessageBox.question(
+                    self, "Confirm", "Are you sure you want to restart the game?",
+                    QtWidgets.QMessageBox.StandardButton.Yes, QtWidgets.QMessageBox.StandardButton.No
+                ) == QtWidgets.QMessageBox.StandardButton.Yes:
             self._set_field()
+            self._game_state = GAME_RUNNING
+        else:
+            self._game_state = prev_game_state
 
     def show_settings_dialog(self):
         """Show settings dialog."""
@@ -397,7 +403,7 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
         self.settings_dialog.spinBox_animationPeriod.setValue(self.settings_animation_period)
         self.settings_dialog.show()
 
-    def _update_settings(self):
+    def update_settings(self):
         """Update settings if settings dialog was accepted."""
         rows, cols, mines, animation_period = (
             self.settings_dialog.spinBox_rows.value(),
@@ -412,8 +418,10 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
         if (self.settings_rows, self.settings_cols, self.settings_mines) != (rows, cols, mines):
             self.settings_rows, self.settings_cols, self.settings_mines = rows, cols, mines
             # Auto game restart
-            if not self._uncovered_cells or self._game_state != GAME_RUNNING:
+            if (not self._uncovered_cells and self._game_state == GAME_RUNNING) or self._game_state == GAME_END:
+                self._game_state = GAME_BLOCK
                 self._set_field()
+                self._game_state = GAME_RUNNING
 
     def _animation_sleep(self):
         QtTest.QTest.qWait(self.settings_animation_period)  # QTimer should be used, but this is much easier
@@ -428,14 +436,14 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
 
     def _set_field(self):
         """Init field with size specified in settings (start a new game)."""
+        self.timer.stop()
+
         rows, cols, mines = self.settings_rows, self.settings_cols, self.settings_mines
         self._num_rows = rows
         self._num_cols = cols
         self._num_mines = mines
-        self._game_state = GAME_RUNNING
         self._uncovered_cells = 0
         self._flagged_cells = 0
-        self.timer.stop()
         self.timeEdit_timer.setTime(QtCore.QTime(0, 0, 0, 0))
         self.lcdNumber_cellsNotMined.display(self._num_rows * self._num_cols - self._num_mines)
         self.lcdNumber_cellsMined.display(self._num_mines)
@@ -501,6 +509,7 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
         """Uncover covered cell."""
         if self._game_state != GAME_RUNNING:
             return
+        self._game_state = GAME_BLOCK
 
         if not self._uncovered_cells:  # start timer only after first uncover
             self.timer.start(1000)
@@ -508,19 +517,28 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
         item = self.tableWidget.item(row, col)
         label = self.tableWidget.cellWidget(row, col)
         item_text = item.text()
-        if item_text != CELL_COVERED:  # ignore if not default covered cell
-            return
-        if label.mined:
-            self._end_game(row, col, defeat=True)
+
+        game_continue = True
+        if item_text == CELL_COVERED:  # process only if default covered cell
+            if label.mined:
+                self._end_game(row, col, defeat=True)
+                game_continue = False
+            else:
+                self._recurse_uncover(row, col)
+                if self._num_rows * self._num_cols - self._uncovered_cells == self._num_mines:
+                    self._end_game(defeat=False)
+                    game_continue = False
+
+        if game_continue:
+            self._game_state = GAME_RUNNING
         else:
-            self._recurse_uncover(row, col)
-            if self._num_rows * self._num_cols - self._uncovered_cells == self._num_mines:
-                self._end_game(defeat=False)
+            self._game_state = GAME_END
 
     def cell_toggle_flag(self, row, col):
         """Toggle flag on covered cell."""
         if self._game_state != GAME_RUNNING:
             return
+        self._game_state = GAME_BLOCK
 
         item = self.tableWidget.item(row, col)
         item_text = item.text()
@@ -534,22 +552,21 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
             return
 
         self._emit_flagged_cells()
+        self._game_state = GAME_RUNNING
 
     def _end_game(self, row=-1, col=-1, *, defeat):
         """Game end."""
-        self._game_state = GAME_BLOCK
         self.timer.stop()
+
         title = "Info"
         if defeat:
             self._show_mines_explode(row, col)
             text = "DEFEAT!"
             QtWidgets.QMessageBox.warning(self, title, text, QtWidgets.QMessageBox.StandardButton.Ok)
-            self._game_state = GAME_DEFEAT
         else:
             self._show_mines_defused()
             text = "VICTORY!"
             QtWidgets.QMessageBox.information(self, title, text, QtWidgets.QMessageBox.StandardButton.Ok)
-            self._game_state = GAME_VICTORY
 
     def _show_mines_explode(self, row, col):
         """Shows all mines exploding."""
