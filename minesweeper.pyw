@@ -376,6 +376,8 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
         self.action_restartGame.setShortcut(QtGui.QKeySequence("Alt+R"))
         self.action_settings.setShortcut(QtGui.QKeySequence("Alt+S"))
         self.action_aboutProgram.setShortcut(QtGui.QKeySequence("Alt+A"))
+        self.action_themeLight.setShortcut(QtGui.QKeySequence("Alt+1"))
+        self.action_themeDark.setShortcut(QtGui.QKeySequence("Alt+2"))
 
         # Init minesweeper logic
         self._num_rows = 0
@@ -700,6 +702,7 @@ class ThemeController:
     """Theme controller, can set light or dark theme."""
 
     def __init__(self):
+        """Initialize theme controller."""
         qdarktheme.setup_theme("auto")
         if darkdetect.theme() == "Dark":
             self.theme = THEME_DARK
@@ -708,12 +711,14 @@ class ThemeController:
             self.theme = THEME_LIGHT
 
     def set_dark(self):
+        """Set dark theme."""
         if self.theme != THEME_DARK:
             qdarktheme.setup_theme("dark")
             self.theme = THEME_DARK
             self.invert_images_colors()
 
     def set_light(self):
+        """Set light theme."""
         if self.theme != THEME_LIGHT:
             qdarktheme.setup_theme("light")
             self.theme = THEME_LIGHT
@@ -721,6 +726,7 @@ class ThemeController:
 
     @staticmethod
     def invert_images_colors():
+        """Invert covered images for light/dark theme."""
         for _code, _img in PICT_DICT.items():
             if _code in {CELL_COVERED, CELL_COVERED_FLAG}:
                 _img.invertPixels(QtGui.QImage.InvertMode.InvertRgb)
