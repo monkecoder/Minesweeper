@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'minesweeper_window.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.7.2
+## Created by: Qt User Interface Compiler version 6.8.0
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -33,13 +33,19 @@ class Ui_MinesweeperWindow(object):
         self.action_settings.setObjectName(u"action_settings")
         self.action_aboutProgram = QAction(MinesweeperWindow)
         self.action_aboutProgram.setObjectName(u"action_aboutProgram")
+        self.action_themeLight = QAction(MinesweeperWindow)
+        self.action_themeLight.setObjectName(u"action_themeLight")
+        self.action_themeLight.setCheckable(True)
+        self.action_themeDark = QAction(MinesweeperWindow)
+        self.action_themeDark.setObjectName(u"action_themeDark")
+        self.action_themeDark.setCheckable(True)
         self.centralwidget = QWidget(MinesweeperWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.gridLayout = QGridLayout(self.centralwidget)
         self.gridLayout.setObjectName(u"gridLayout")
         self.tableWidget = QTableWidget(self.centralwidget)
         self.tableWidget.setObjectName(u"tableWidget")
-        self.tableWidget.viewport().setProperty("cursor", QCursor(Qt.CursorShape.PointingHandCursor))
+        self.tableWidget.viewport().setProperty(u"cursor", QCursor(Qt.CursorShape.PointingHandCursor))
 
         self.gridLayout.addWidget(self.tableWidget, 2, 0, 1, 1)
 
@@ -137,14 +143,22 @@ class Ui_MinesweeperWindow(object):
         self.menu_settings.setObjectName(u"menu_settings")
         self.menu_help = QMenu(self.menubar)
         self.menu_help.setObjectName(u"menu_help")
+        self.menu_vIew = QMenu(self.menubar)
+        self.menu_vIew.setObjectName(u"menu_vIew")
+        self.menu_theme = QMenu(self.menu_vIew)
+        self.menu_theme.setObjectName(u"menu_theme")
         MinesweeperWindow.setMenuBar(self.menubar)
 
         self.menubar.addAction(self.menu_settings.menuAction())
+        self.menubar.addAction(self.menu_vIew.menuAction())
         self.menubar.addAction(self.menu_help.menuAction())
         self.menu_settings.addAction(self.action_restartGame)
         self.menu_settings.addSeparator()
         self.menu_settings.addAction(self.action_settings)
         self.menu_help.addAction(self.action_aboutProgram)
+        self.menu_vIew.addAction(self.menu_theme.menuAction())
+        self.menu_theme.addAction(self.action_themeLight)
+        self.menu_theme.addAction(self.action_themeDark)
 
         self.retranslateUi(MinesweeperWindow)
 
@@ -156,6 +170,8 @@ class Ui_MinesweeperWindow(object):
         self.action_restartGame.setText(QCoreApplication.translate("MinesweeperWindow", u"Restart game", None))
         self.action_settings.setText(QCoreApplication.translate("MinesweeperWindow", u"Settings", None))
         self.action_aboutProgram.setText(QCoreApplication.translate("MinesweeperWindow", u"About program", None))
+        self.action_themeLight.setText(QCoreApplication.translate("MinesweeperWindow", u"Light", None))
+        self.action_themeDark.setText(QCoreApplication.translate("MinesweeperWindow", u"Dark", None))
         self.label_cellsUncovered.setText(QCoreApplication.translate("MinesweeperWindow", u"Uncovered cells:", None))
         self.label_1.setText(QCoreApplication.translate("MinesweeperWindow", u"/", None))
         self.label_cellsFlagged.setText(QCoreApplication.translate("MinesweeperWindow", u"Flagged cells:", None))
@@ -164,5 +180,7 @@ class Ui_MinesweeperWindow(object):
         self.timeEdit_timer.setDisplayFormat(QCoreApplication.translate("MinesweeperWindow", u"mm:ss", None))
         self.menu_settings.setTitle(QCoreApplication.translate("MinesweeperWindow", u"Game", None))
         self.menu_help.setTitle(QCoreApplication.translate("MinesweeperWindow", u"Help", None))
+        self.menu_vIew.setTitle(QCoreApplication.translate("MinesweeperWindow", u"VIew", None))
+        self.menu_theme.setTitle(QCoreApplication.translate("MinesweeperWindow", u"Theme", None))
     # retranslateUi
 

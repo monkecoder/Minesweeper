@@ -197,7 +197,21 @@
     </property>
     <addaction name="action_aboutProgram"/>
    </widget>
+   <widget class="QMenu" name="menu_vIew">
+    <property name="title">
+     <string>VIew</string>
+    </property>
+    <widget class="QMenu" name="menu_theme">
+     <property name="title">
+      <string>Theme</string>
+     </property>
+     <addaction name="action_themeLight"/>
+     <addaction name="action_themeDark"/>
+    </widget>
+    <addaction name="menu_theme"/>
+   </widget>
    <addaction name="menu_settings"/>
+   <addaction name="menu_vIew"/>
    <addaction name="menu_help"/>
   </widget>
   <action name="action_restartGame">
@@ -213,6 +227,22 @@
   <action name="action_aboutProgram">
    <property name="text">
     <string>About program</string>
+   </property>
+  </action>
+  <action name="action_themeLight">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Light</string>
+   </property>
+  </action>
+  <action name="action_themeDark">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Dark</string>
    </property>
   </action>
  </widget>

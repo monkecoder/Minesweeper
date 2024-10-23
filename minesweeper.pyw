@@ -4,7 +4,9 @@ from configparser import ConfigParser
 from pathlib import Path
 from types import MappingProxyType
 
+import darkdetect
 import numpy as np
+import qdarktheme
 from PySide6 import QtCore, QtGui, QtWidgets, QtTest
 
 from gui.minesweeper_about_ui import Ui_MinesweeperAbout
@@ -50,6 +52,9 @@ MIN_COLS = 4
 MAX_COLS = 30
 MIN_ANIMATION_PERIOD = 0
 MAX_ANIMATION_PERIOD = 250
+
+THEME_LIGHT = 0
+THEME_DARK = 1
 
 
 class MinesweeperConfig:
@@ -221,10 +226,10 @@ class ItemDelegate(QtWidgets.QStyledItemDelegate):
 
     def paint(self, painter, option, index):
         """Paint picture based on code in item text."""
-        painter.save()
+        # painter.save()
         text = self.table_widget.item(index.row(), index.column()).text()
         painter.drawImage(option.rect, PICT_DICT[text])
-        painter.restore()
+        # painter.restore()
 
 
 class CustomLabel(QtWidgets.QLabel):
@@ -318,6 +323,7 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
         self.settings_dialog.buttonBox.accepted.connect(self.update_settings)
         self.about_dialog = MinesweeperAbout(self)
         self.about_dialog.setWindowModality(QtCore.Qt.WindowModality.ApplicationModal)
+        self._theme_controller = ThemeController()
 
         self.setupUi(self)
         self.setWindowTitle("Minesweeper")
@@ -347,6 +353,16 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
         self.action_restartGame.triggered.connect(self.restart_game)
         self.action_settings.triggered.connect(self.show_settings_dialog)
         self.action_aboutProgram.triggered.connect(self.about_dialog.show)
+        self.action_themeLight.triggered.connect(lambda: (self._theme_controller.set_light(),
+                                                          self.action_themeLight.setChecked(True),
+                                                          self.action_themeDark.setChecked(False)))
+        self.action_themeDark.triggered.connect(lambda: (self._theme_controller.set_dark(),
+                                                         self.action_themeLight.setChecked(False),
+                                                         self.action_themeDark.setChecked(True)))
+        if self._theme_controller.theme == THEME_LIGHT:
+            self.action_themeLight.setChecked(True)
+        elif self._theme_controller.theme == THEME_DARK:
+            self.action_themeDark.setChecked(True)
 
         for widget in (self.lcdNumber_cellsUncovered, self.label_1, self.lcdNumber_cellsNotMined):
             widget.setToolTip("Uncovered cells / Not mined cells")
@@ -680,10 +696,41 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
             event.ignore()
 
 
+class ThemeController:
+    """Theme controller, can set light or dark theme."""
+
+    def __init__(self):
+        qdarktheme.setup_theme("auto")
+        if darkdetect.theme() == "Dark":
+            self.theme = THEME_DARK
+            self.invert_images_colors()
+        else:
+            self.theme = THEME_LIGHT
+
+    def set_dark(self):
+        if self.theme != THEME_DARK:
+            qdarktheme.setup_theme("dark")
+            self.theme = THEME_DARK
+            self.invert_images_colors()
+
+    def set_light(self):
+        if self.theme != THEME_LIGHT:
+            qdarktheme.setup_theme("light")
+            self.theme = THEME_LIGHT
+            self.invert_images_colors()
+
+    @staticmethod
+    def invert_images_colors():
+        for _code, _img in PICT_DICT.items():
+            if _code in {CELL_COVERED, CELL_COVERED_FLAG}:
+                _img.invertPixels(QtGui.QImage.InvertMode.InvertRgb)
+
+
 def main(sys_argv):
     """Start minesweeper application."""
     app = QtWidgets.QApplication(sys_argv)
     # app.setStyle(QtWidgets.QStyleFactory.create("Fusion"))
+
     try:
         window = MinesweeperWindow()
     except ValueError as e:
