@@ -390,6 +390,12 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
         self._set_field()
         self._game_state = GAME_RUNNING
 
+        self._ignore_animation_period = False
+
+    def keyPressEvent(self, event):
+        if event.key() == QtCore.Qt.Key.Key_Escape and self._game_state == GAME_BLOCK:
+            self._ignore_animation_period = True
+
     def _timer_job(self):
         """Update data for timeEdit_timer widget (executed by timer)."""
         time_obj = self.timeEdit_timer.time().addMSecs(self.timer.interval())
@@ -442,7 +448,8 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
                 self._game_state = GAME_RUNNING
 
     def _animation_sleep(self):
-        QtTest.QTest.qWait(self.settings_animation_period)  # QTimer should be used, but this is much easier
+        if not self._ignore_animation_period:
+            QtTest.QTest.qWait(self.settings_animation_period)  # QTimer should be used, but this is much easier
 
     def _emit_uncovered_cells(self):
         """Update data for lineEdit_cellsUncovered widget."""
@@ -588,6 +595,8 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
 
     def _show_mines_explode(self, row, col):
         """Shows all mines exploding."""
+        self._ignore_animation_period = False
+
         # Serial explodes in increasing square
         table_widget = self.tableWidget
 
@@ -647,6 +656,8 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
 
     def _show_mines_defused(self):
         """Shows all mines being defused."""
+        self._ignore_animation_period = False
+
         # Serial defuse from up to down
         table_widget = self.tableWidget
         rows, cols = table_widget.rowCount(), table_widget.columnCount()
