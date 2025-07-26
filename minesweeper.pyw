@@ -35,11 +35,6 @@ GAME_BLOCK = 0
 GAME_RUNNING = 1
 GAME_END = 2
 
-# idk why, but pixmap crushes program execution (Process finished with exit code -1073741819 (0xC0000005))
-# TEST_PIXMAP = QtGui.QPixmap()
-# TEST_PIXMAP.load("BigFruit.png")
-# TEST_PIXMAP.fromImage(PICT_DICT[CELL_COVERED])
-
 DEFAULT_CONFIG_PATH = BASE_PATH / "minesweeper.ini"
 DEFAULT_ROW_COUNT = 10
 DEFAULT_COL_COUNT = 10
