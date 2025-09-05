@@ -41,24 +41,14 @@ class Ui_MinesweeperWindow(object):
         self.action_themeDark.setCheckable(True)
         self.centralwidget = QWidget(MinesweeperWindow)
         self.centralwidget.setObjectName(u"centralwidget")
-        self.gridLayout = QGridLayout(self.centralwidget)
-        self.gridLayout.setObjectName(u"gridLayout")
-        self.tableWidget = QTableWidget(self.centralwidget)
-        self.tableWidget.setObjectName(u"tableWidget")
-        self.tableWidget.viewport().setProperty(u"cursor", QCursor(Qt.CursorShape.PointingHandCursor))
-        self.tableWidget.horizontalHeader().setMinimumSectionSize(25)
-        self.tableWidget.horizontalHeader().setDefaultSectionSize(50)
-        self.tableWidget.verticalHeader().setMinimumSectionSize(25)
-        self.tableWidget.verticalHeader().setDefaultSectionSize(50)
-
-        self.gridLayout.addWidget(self.tableWidget, 2, 0, 1, 1)
-
-        self.horizontalLayout = QHBoxLayout()
-        self.horizontalLayout.setObjectName(u"horizontalLayout")
+        self.verticalLayout = QVBoxLayout(self.centralwidget)
+        self.verticalLayout.setObjectName(u"verticalLayout")
+        self.horizontalLayout_panel = QHBoxLayout()
+        self.horizontalLayout_panel.setObjectName(u"horizontalLayout_panel")
         self.label_cellsUncovered = QLabel(self.centralwidget)
         self.label_cellsUncovered.setObjectName(u"label_cellsUncovered")
 
-        self.horizontalLayout.addWidget(self.label_cellsUncovered)
+        self.horizontalLayout_panel.addWidget(self.label_cellsUncovered)
 
         self.lcdNumber_cellsUncovered = QLCDNumber(self.centralwidget)
         self.lcdNumber_cellsUncovered.setObjectName(u"lcdNumber_cellsUncovered")
@@ -66,12 +56,12 @@ class Ui_MinesweeperWindow(object):
         self.lcdNumber_cellsUncovered.setDigitCount(3)
         self.lcdNumber_cellsUncovered.setSegmentStyle(QLCDNumber.SegmentStyle.Flat)
 
-        self.horizontalLayout.addWidget(self.lcdNumber_cellsUncovered)
+        self.horizontalLayout_panel.addWidget(self.lcdNumber_cellsUncovered)
 
         self.label_1 = QLabel(self.centralwidget)
         self.label_1.setObjectName(u"label_1")
 
-        self.horizontalLayout.addWidget(self.label_1)
+        self.horizontalLayout_panel.addWidget(self.label_1)
 
         self.lcdNumber_cellsNotMined = QLCDNumber(self.centralwidget)
         self.lcdNumber_cellsNotMined.setObjectName(u"lcdNumber_cellsNotMined")
@@ -79,12 +69,12 @@ class Ui_MinesweeperWindow(object):
         self.lcdNumber_cellsNotMined.setDigitCount(3)
         self.lcdNumber_cellsNotMined.setSegmentStyle(QLCDNumber.SegmentStyle.Flat)
 
-        self.horizontalLayout.addWidget(self.lcdNumber_cellsNotMined)
+        self.horizontalLayout_panel.addWidget(self.lcdNumber_cellsNotMined)
 
         self.label_cellsFlagged = QLabel(self.centralwidget)
         self.label_cellsFlagged.setObjectName(u"label_cellsFlagged")
 
-        self.horizontalLayout.addWidget(self.label_cellsFlagged)
+        self.horizontalLayout_panel.addWidget(self.label_cellsFlagged)
 
         self.lcdNumber_cellsFlagged = QLCDNumber(self.centralwidget)
         self.lcdNumber_cellsFlagged.setObjectName(u"lcdNumber_cellsFlagged")
@@ -92,12 +82,12 @@ class Ui_MinesweeperWindow(object):
         self.lcdNumber_cellsFlagged.setDigitCount(3)
         self.lcdNumber_cellsFlagged.setSegmentStyle(QLCDNumber.SegmentStyle.Flat)
 
-        self.horizontalLayout.addWidget(self.lcdNumber_cellsFlagged)
+        self.horizontalLayout_panel.addWidget(self.lcdNumber_cellsFlagged)
 
         self.label_2 = QLabel(self.centralwidget)
         self.label_2.setObjectName(u"label_2")
 
-        self.horizontalLayout.addWidget(self.label_2)
+        self.horizontalLayout_panel.addWidget(self.label_2)
 
         self.lcdNumber_cellsMined = QLCDNumber(self.centralwidget)
         self.lcdNumber_cellsMined.setObjectName(u"lcdNumber_cellsMined")
@@ -105,16 +95,16 @@ class Ui_MinesweeperWindow(object):
         self.lcdNumber_cellsMined.setDigitCount(3)
         self.lcdNumber_cellsMined.setSegmentStyle(QLCDNumber.SegmentStyle.Flat)
 
-        self.horizontalLayout.addWidget(self.lcdNumber_cellsMined)
+        self.horizontalLayout_panel.addWidget(self.lcdNumber_cellsMined)
 
-        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+        self.horizontalSpacer_panel = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
-        self.horizontalLayout.addItem(self.horizontalSpacer)
+        self.horizontalLayout_panel.addItem(self.horizontalSpacer_panel)
 
         self.label_timer = QLabel(self.centralwidget)
         self.label_timer.setObjectName(u"label_timer")
 
-        self.horizontalLayout.addWidget(self.label_timer)
+        self.horizontalLayout_panel.addWidget(self.label_timer)
 
         self.frame_timer = QFrame(self.centralwidget)
         self.frame_timer.setObjectName(u"frame_timer")
@@ -134,10 +124,26 @@ class Ui_MinesweeperWindow(object):
         self.verticalLayout_2.addWidget(self.timeEdit_timer)
 
 
-        self.horizontalLayout.addWidget(self.frame_timer)
+        self.horizontalLayout_panel.addWidget(self.frame_timer)
 
 
-        self.gridLayout.addLayout(self.horizontalLayout, 0, 0, 1, 1)
+        self.verticalLayout.addLayout(self.horizontalLayout_panel)
+
+        self.gridLayout_field = QGridLayout()
+        self.gridLayout_field.setSpacing(0)
+        self.gridLayout_field.setObjectName(u"gridLayout_field")
+        self.tableWidget = QTableWidget(self.centralwidget)
+        self.tableWidget.setObjectName(u"tableWidget")
+        self.tableWidget.viewport().setProperty(u"cursor", QCursor(Qt.CursorShape.PointingHandCursor))
+        self.tableWidget.horizontalHeader().setMinimumSectionSize(25)
+        self.tableWidget.horizontalHeader().setDefaultSectionSize(50)
+        self.tableWidget.verticalHeader().setMinimumSectionSize(25)
+        self.tableWidget.verticalHeader().setDefaultSectionSize(50)
+
+        self.gridLayout_field.addWidget(self.tableWidget, 0, 0, 1, 1)
+
+
+        self.verticalLayout.addLayout(self.gridLayout_field)
 
         MinesweeperWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MinesweeperWindow)

@@ -387,6 +387,11 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
 
         self._ignore_animation_period = False
 
+        self.gridLayout_field.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+
+        self.show()
+        self._resize_table_widget()
+
     def keyPressEvent(self, event):
         if event.key() == QtCore.Qt.Key.Key_Escape and self._game_state == GAME_BLOCK:
             self._ignore_animation_period = True
@@ -669,6 +674,17 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
             if is_row_mined:
                 self._animation_sleep()
 
+    def _resize_table_widget(self):
+        """Resize tableWidget to maximum available size."""
+        available_size = self.gridLayout_field.geometry().size()
+        height, width = available_size.height(), available_size.width()
+        if height and width:
+            table_widget = self.tableWidget
+            height_cnt, width_cnt = table_widget.rowCount(), table_widget.columnCount()
+            coef = min(height // height_cnt, width // width_cnt)
+            table_widget.setMaximumHeight(height_cnt * coef)
+            table_widget.setMaximumWidth(width_cnt * coef)
+
     def tableKeyPressEvent(self, event):
         """Reimplementation of keyPressEvent for tableWidget, handles key pressing."""
         if event.key() in {QtCore.Qt.Key.Key_Space, QtCore.Qt.Key.Key_Return, QtCore.Qt.Key.Key_Enter}:
@@ -681,6 +697,12 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
             label.signal_cell_right_btn.emit(row, col)
 
         QtWidgets.QTableWidget.keyPressEvent(self.tableWidget, event)
+
+    def resizeEvent(self, event):
+        """Resize event reimplementation."""
+        result = QtWidgets.QMainWindow.resizeEvent(self, event)
+        self._resize_table_widget()
+        return result
 
     def eventFilter(self, watched, event):
         """Event filter for timeEdit_timer widget, ignore all mouse events."""
@@ -747,7 +769,7 @@ def main(sys_argv):
         window = QtWidgets.QMainWindow()
         QtWidgets.QMessageBox.critical(window, "Minesweeper error", str(e), QtWidgets.QMessageBox.StandardButton.Ok)
         return -1
-    window.show()
+
     return app.exec()
 
 
