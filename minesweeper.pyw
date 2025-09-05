@@ -568,8 +568,6 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
         elif item_text == CELL_COVERED_FLAG:
             item.setText(CELL_COVERED)
             self._flagged_cells -= 1
-        else:
-            return
 
         self._emit_flagged_cells()
         self._game_state = GAME_RUNNING
