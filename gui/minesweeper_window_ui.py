@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'minesweeper_window.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.8.0
+## Created by: Qt User Interface Compiler version 6.9.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -46,6 +46,10 @@ class Ui_MinesweeperWindow(object):
         self.tableWidget = QTableWidget(self.centralwidget)
         self.tableWidget.setObjectName(u"tableWidget")
         self.tableWidget.viewport().setProperty(u"cursor", QCursor(Qt.CursorShape.PointingHandCursor))
+        self.tableWidget.horizontalHeader().setMinimumSectionSize(25)
+        self.tableWidget.horizontalHeader().setDefaultSectionSize(50)
+        self.tableWidget.verticalHeader().setMinimumSectionSize(25)
+        self.tableWidget.verticalHeader().setDefaultSectionSize(50)
 
         self.gridLayout.addWidget(self.tableWidget, 2, 0, 1, 1)
 
