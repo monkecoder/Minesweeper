@@ -1,5 +1,6 @@
 """Minesweeper game based on PySide6."""
 
+import platform
 from configparser import ConfigParser
 from pathlib import Path
 from types import MappingProxyType
@@ -12,6 +13,12 @@ from PySide6 import QtCore, QtGui, QtWidgets, QtTest
 from gui.minesweeper_about_ui import Ui_MinesweeperAbout
 from gui.minesweeper_settings_ui import Ui_MinesweeperSettings
 from gui.minesweeper_window_ui import Ui_MinesweeperWindow
+
+if platform.system() == "Windows":
+    import ctypes
+    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(
+        "monkecoder.minesweeper.default"
+    )
 
 BASE_PATH = Path(__file__).parent
 
