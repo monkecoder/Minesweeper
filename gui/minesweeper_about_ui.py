@@ -16,18 +16,19 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QAbstractButton, QApplication, QDialog, QDialogButtonBox,
-    QFrame, QLabel, QSizePolicy, QSpacerItem,
-    QVBoxLayout, QWidget)
+    QFrame, QLabel, QLayout, QSizePolicy,
+    QSpacerItem, QVBoxLayout, QWidget)
 
 class Ui_MinesweeperAbout(object):
     def setupUi(self, MinesweeperAbout):
         if not MinesweeperAbout.objectName():
             MinesweeperAbout.setObjectName(u"MinesweeperAbout")
-        MinesweeperAbout.resize(318, 435)
+        MinesweeperAbout.resize(318, 430)
         MinesweeperAbout.setContextMenuPolicy(Qt.ContextMenuPolicy.ActionsContextMenu)
         MinesweeperAbout.setAcceptDrops(True)
         self.verticalLayout = QVBoxLayout(MinesweeperAbout)
         self.verticalLayout.setObjectName(u"verticalLayout")
+        self.verticalLayout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)
         self.label = QLabel(MinesweeperAbout)
         self.label.setObjectName(u"label")
         font = QFont()
