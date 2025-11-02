@@ -1,5 +1,6 @@
 """Minesweeper game based on PySide6."""
 
+import enum
 import platform
 from configparser import ConfigParser
 from pathlib import Path
@@ -22,12 +23,12 @@ if platform.system() == "Windows":
 
 BASE_PATH = Path(__file__).parent
 
-CELL_COVERED = "c"              # cell is covered, default
-CELL_COVERED_FLAG = "f"         # cell is covered, flag
-CELL_UNCOVERED = "u"            # cell is uncovered, default
-CELL_UNCOVERED_MINE = "m"       # cell is uncovered, mine
-CELL_UNCOVERED_MINE_OK = "o"    # cell is uncovered, mine defused
-CELL_UNCOVERED_MINE_BAD = "b"   # cell is uncovered, mine exploded
+CELL_COVERED = "c"             # cell is covered, default
+CELL_COVERED_FLAG = "f"        # cell is covered, flag
+CELL_UNCOVERED = "u"           # cell is uncovered, default
+CELL_UNCOVERED_MINE = "m"      # cell is uncovered, mine
+CELL_UNCOVERED_MINE_OK = "o"   # cell is uncovered, mine defused
+CELL_UNCOVERED_MINE_BAD = "b"  # cell is uncovered, mine exploded
 
 PICT_DICT = MappingProxyType({
     CELL_COVERED:            QtGui.QImage(BASE_PATH / "images" / "cell_white.png"),
@@ -37,10 +38,6 @@ PICT_DICT = MappingProxyType({
     CELL_UNCOVERED_MINE_OK:  QtGui.QImage(BASE_PATH / "images" / "pig_ok.png"),
     CELL_UNCOVERED_MINE_BAD: QtGui.QImage(BASE_PATH / "images" / "pig_bad.png"),
 })
-
-GAME_BLOCK = 0
-GAME_RUNNING = 1
-GAME_END = 2
 
 DEFAULT_CONFIG_PATH = BASE_PATH / "minesweeper.ini"
 DEFAULT_ROW_COUNT = 10
@@ -55,8 +52,16 @@ MAX_COLS = 30
 MIN_ANIMATION_PERIOD = 0
 MAX_ANIMATION_PERIOD = 250
 
-THEME_LIGHT = 0
-THEME_DARK = 1
+
+class ThemeState(enum.IntEnum):
+    LIGHT = 0
+    DARK = 1
+
+
+class GameState(enum.IntEnum):
+    BLOCK = 0
+    RUNNING = 1
+    END = 2
 
 
 class MinesweeperConfig:
@@ -361,9 +366,9 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
         self.action_themeDark.triggered.connect(lambda: (self._theme_controller.set_dark(),
                                                          self.action_themeLight.setChecked(False),
                                                          self.action_themeDark.setChecked(True)))
-        if self._theme_controller.theme == THEME_LIGHT:
+        if self._theme_controller.theme == ThemeState.LIGHT:
             self.action_themeLight.setChecked(True)
-        elif self._theme_controller.theme == THEME_DARK:
+        elif self._theme_controller.theme == ThemeState.DARK:
             self.action_themeDark.setChecked(True)
 
         for widget in (self.lcdNumber_cellsUncovered, self.label_1, self.lcdNumber_cellsNotMined):
@@ -390,7 +395,7 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
         self._flagged_cells = 0
 
         self._set_field()
-        self._game_state = GAME_RUNNING
+        self._game_state = GameState.RUNNING
 
         self._ignore_animation_period = False
 
@@ -400,7 +405,7 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
         self._resize_table_widget()
 
     def keyPressEvent(self, event):
-        if event.key() == QtCore.Qt.Key.Key_Escape and self._game_state == GAME_BLOCK:
+        if event.key() == QtCore.Qt.Key.Key_Escape and self._game_state == GameState.BLOCK:
             self._ignore_animation_period = True
 
     def _timer_job(self):
@@ -410,19 +415,21 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
 
     def restart_game(self):
         """Start a new game."""
-        if self._game_state == GAME_BLOCK:
+        if self._game_state == GameState.BLOCK:
             return
         prev_game_state = self._game_state
-        self._game_state = GAME_BLOCK
+        self._game_state = GameState.BLOCK
 
         # ask only after game started
-        if (not self._uncovered_cells and prev_game_state == GAME_RUNNING) or prev_game_state == GAME_END or \
-                QtWidgets.QMessageBox.question(
+        if (
+                (not self._uncovered_cells and prev_game_state == GameState.RUNNING) or
+                prev_game_state == GameState.END or QtWidgets.QMessageBox.question(
                     self, "Confirm", "Are you sure you want to restart the game?",
                     QtWidgets.QMessageBox.StandardButton.Yes, QtWidgets.QMessageBox.StandardButton.No
-                ) == QtWidgets.QMessageBox.StandardButton.Yes:
+                ) == QtWidgets.QMessageBox.StandardButton.Yes
+        ):
             self._set_field()
-            self._game_state = GAME_RUNNING
+            self._game_state = GameState.RUNNING
         else:
             self._game_state = prev_game_state
 
@@ -449,10 +456,13 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
         if (self.settings_rows, self.settings_cols, self.settings_mines) != (rows, cols, mines):
             self.settings_rows, self.settings_cols, self.settings_mines = rows, cols, mines
             # Auto game restart
-            if (not self._uncovered_cells and self._game_state == GAME_RUNNING) or self._game_state == GAME_END:
-                self._game_state = GAME_BLOCK
+            if (
+                    (not self._uncovered_cells and self._game_state == GameState.RUNNING) or
+                    self._game_state == GameState.END
+            ):
+                self._game_state = GameState.BLOCK
                 self._set_field()
-                self._game_state = GAME_RUNNING
+                self._game_state = GameState.RUNNING
 
     def _animation_sleep(self):
         if not self._ignore_animation_period:
@@ -539,9 +549,9 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
 
     def cell_uncover(self, row, col):
         """Uncover covered cell."""
-        if self._game_state != GAME_RUNNING:
+        if self._game_state != GameState.RUNNING:
             return
-        self._game_state = GAME_BLOCK
+        self._game_state = GameState.BLOCK
 
         if not self._uncovered_cells:  # start timer only after first uncover
             self.timer.start(1000)
@@ -562,15 +572,15 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
                     game_continue = False
 
         if game_continue:
-            self._game_state = GAME_RUNNING
+            self._game_state = GameState.RUNNING
         else:
-            self._game_state = GAME_END
+            self._game_state = GameState.END
 
     def cell_toggle_flag(self, row, col):
         """Toggle flag on covered cell."""
-        if self._game_state != GAME_RUNNING:
+        if self._game_state != GameState.RUNNING:
             return
-        self._game_state = GAME_BLOCK
+        self._game_state = GameState.BLOCK
 
         item = self.tableWidget.item(row, col)
         item_text = item.text()
@@ -582,7 +592,7 @@ class MinesweeperWindow(QtWidgets.QMainWindow, Ui_MinesweeperWindow):
             self._flagged_cells -= 1
 
         self._emit_flagged_cells()
-        self._game_state = GAME_RUNNING
+        self._game_state = GameState.RUNNING
 
     def _end_game(self, row=-1, col=-1, *, defeat):
         """Game end."""
@@ -738,23 +748,23 @@ class ThemeController:
         """Initialize theme controller."""
         qdarktheme.setup_theme("auto")
         if darkdetect.theme() == "Dark":
-            self.theme = THEME_DARK
+            self.theme = ThemeState.DARK
             self.invert_images_colors()
         else:
-            self.theme = THEME_LIGHT
+            self.theme = ThemeState.LIGHT
 
     def set_dark(self):
         """Set dark theme."""
-        if self.theme != THEME_DARK:
+        if self.theme != ThemeState.DARK:
             qdarktheme.setup_theme("dark")
-            self.theme = THEME_DARK
+            self.theme = ThemeState.DARK
             self.invert_images_colors()
 
     def set_light(self):
         """Set light theme."""
-        if self.theme != THEME_LIGHT:
+        if self.theme != ThemeState.LIGHT:
             qdarktheme.setup_theme("light")
-            self.theme = THEME_LIGHT
+            self.theme = ThemeState.LIGHT
             self.invert_images_colors()
 
     @staticmethod
